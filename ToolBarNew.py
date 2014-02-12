@@ -153,7 +153,6 @@ class GPSWindow(wx.Frame):
 		
 	def OnTimer(self, event):
 		self.updateTheView()
-		print("timer")
 
 	def updateTheView(self):
 		global coordinate1
@@ -274,6 +273,7 @@ class PyMap:
 		var marker;
 		var center;
 		var poly;
+		var infowindow;
 		function initialize() {
 			center = new google.maps.LatLng(0.0,0.0);
 			var mapOptions = {zoom: 4,center: center};
@@ -287,7 +287,7 @@ class PyMap:
 				anchor: new google.maps.Point(10, 10)
 			};
 			map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
-			marker = new google.maps.Marker({position: center, map: map,icon: image});
+			marker = new google.maps.Marker({position: center, map: map,icon: image, animation: google.maps.Animation.DROP});
 			var polyOptions = {
 			strokeColor: '#FFA500',
 			strokeOpacity: 1.0,
@@ -295,15 +295,34 @@ class PyMap:
 			};
 			poly = new google.maps.Polyline(polyOptions);
 			poly.setMap(map);
+			
+			//var contentString = ['coordinates','Latitude: ' + marker.getPosition().lat(), 'Longitude: '+marker.getPosition().lng()].join('<br>');
+			
+			function createInfoWindowContent(){
+				return[
+					'Coordinates:',
+					'Latitude: ' + marker.getPosition().lat(),
+					'Longitude: ' + marker.getPosition().lng()
+				].join('<br>');
+			}
+			infowindow = new google.maps.InfoWindow();
+			
+			google.maps.event.addListener(marker, 'click', function() {
+				infowindow.setContent(createInfoWindowContent());
+				infowindow.open(map,marker);
+			});
 
 
 		}
 
 		function moveMarker(position, map, marker) {
+			//infowindow.close();
 			var path = poly.getPath();
 			path.push(position);
 			marker.setPosition(position);
 			map.panTo(position);
+			//infowindow.setContent(createInfoWindowContent());
+			//infowindow.open(map,marker);
 		}
 
 		google.maps.event.addDomListener(window, 'load', initialize);
