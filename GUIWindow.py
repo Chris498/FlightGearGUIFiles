@@ -9,115 +9,9 @@ import wx.html2
 coordinate1 = 0.0
 coordinate2 = 0.0
 
-#main frame class (aka toolbar)
-class TestFrame(wx.MiniFrame):
-
-
-	#initialize the frame
-	def __init__(self, parent, id):
-		wx.MiniFrame.__init__(self,parent,id,'',size = (770,110))
-		panel=wx.Panel(self)
-		panel.SetBackgroundColour('white')
-		
-		#create all of the toolbar buttons
-		multi = wx.Image("Multi.png",wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-		self.multi=wx.BitmapButton(panel,-1,multi,(10,10))
-		self.Bind(wx.EVT_BUTTON, self.multiplayerButton,self.multi)
-		self.multi.SetDefault()
-		
-		flightPlan = wx.Image("FlightPlan.png",wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-		self.flightPlan = wx.BitmapButton(panel,-1,flightPlan,(160,10))
-		self.Bind(wx.EVT_BUTTON,self.flightplanButton,self.flightPlan)
-		self.flightPlan.SetDefault()
-		
-		gps = wx.Image("GPS.png",wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-		self.gps = wx.BitmapButton(panel,-1,gps,(310,10))
-		self.Bind(wx.EVT_BUTTON,self.gpsButton,self.gps)
-		self.gps.SetDefault()
-		
-		log = wx.Image("Log.png",wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-		self.log = wx.BitmapButton(panel,-1,log,(460,10))
-		self.Bind(wx.EVT_BUTTON,self.logButton,self.log)
-		self.log.SetDefault()
-		
-		otherFlights = wx.Image("OtherFlights.png",wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-		self.otherFlights = wx.BitmapButton(panel,-1,otherFlights,(610,10))
-		self.Bind(wx.EVT_BUTTON,self.otherFlightsButton,self.otherFlights)
-		self.otherFlights.SetDefault()
-		
-		#self.timer = wx.Timer(self)
-		#self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
-
-		#self.timer.Start(2000)
-
-	#def OnTimer(self,event):
-		
-		
-	#button methods	
-	def multiplayerButton(self,event):
-		multiWindow = MultiplayerWindow(parent = frame, id= -1)
-		multiWindow.Show()
-		
-	def flightplanButton(self,event):
-		flightplanWindow = FlightplanWindow(parent = frame, id= -1)
-		flightplanWindow.Show()
-		
-	def gpsButton(self,event):
-		gpsWindow = GPSWindow(parent = frame, id = -1)
-		
-	def logButton(self,event):
-		logWindow = LogWindow(parent = frame, id =-1)
-		logWindow.Show()
-	
-	def otherFlightsButton(self, event):
-		otherFlightsWindow = OtherFlightsWindow(parent = frame, id =-1)
-		otherFlightsWindow.Show()
-	
-		
-class MultiplayerWindow(wx.MiniFrame):
-	
-	def __init__(self, parent, id):
-		wx.MiniFrame.__init__(self,parent,id,'Publisher',size = (400,400),style = wx.DEFAULT_FRAME_STYLE)
-		self.panel=wx.Panel(self)
-		send = wx.Button(self.panel,label="Send Message",pos=(10,100),size=(200,50))
-		self.Bind(wx.EVT_BUTTON,self.sendButton,send)	
-		self.Bind(wx.EVT_CLOSE,self.closewindow)
-		wx.StaticText(self.panel, -1, "Message to Send:", pos=(10, 12))
-		self.textBox = wx.TextCtrl(self.panel, -1, "Test it out and see", size=(125, -1), pos = (115,10))
-		
-	def sendButton(self,event):
-		user = os.getenv("ACTIVEMQ_USER") or "admin"
-		password = os.getenv("ACTIVEMQ_PASSWORD") or "password"
-		host = os.getenv("ACTIVEMQ_HOST") or "localhost"
-		port = os.getenv("ACTIVEMQ_PORT") or 61613
-
-
-		conn = stomp.Connection(host_and_ports = [(host, port)])
-		#conn = stomp.Connection(host_and_ports = [("35.9.22.201", port)])
-		#conn = stomp.Connection(host_and_ports = [("10.0.1.17", port)])
-		conn.start()
-		conn.connect(login=user,passcode=password)
-		
-		textString = self.textBox.GetValue()
-
-		conn.send(body=textString, destination='TEST.FOO')
-  
-
-		conn.disconnect()
-	
-	def closewindow(self,event):
-		self.Destroy()
-
-class FlightplanWindow(wx.MiniFrame):
-	def __init__(self, parent, id):
-		wx.MiniFrame.__init__(self,parent,id,'',size = (600,400), style = wx.DEFAULT_FRAME_STYLE)
-		panel=wx.Panel(self)
-		panel.SetBackgroundColour('grey')
-		self.Bind(wx.EVT_CLOSE,self.closewindow)
-		
-	def closewindow(self,event):
-		self.Destroy()		
-	
+class Panel(wx.Panel):
+	def __init__(self,parent,id,pos,size):
+		wx.Panel.__init__(self,parent,id,pos,size)
 
 class GPSWindow(wx.Frame):
 	def __init__(self, parent, id,):  
@@ -125,9 +19,22 @@ class GPSWindow(wx.Frame):
 		#self.html_view = wx.html2.WebView.New(self)
 		#print g.showhtml()		
 		self.count = 1
-	
-		super(GPSWindow, self).__init__(parent, size=(350,365), style = wx.DEFAULT_FRAME_STYLE & ~wx.MAXIMIZE_BOX ^ wx.RESIZE_BORDER)
-		self.html_view = wx.html2.WebView.New(self)
+		
+		super(GPSWindow, self).__init__(parent, size=(1024,700), style = wx.DEFAULT_FRAME_STYLE & ~wx.MAXIMIZE_BOX ^ wx.RESIZE_BORDER)
+		self.mainPanel = wx.Panel(self)
+		
+		mainSizer = wx.BoxSizer(wx.VERTICAL)
+		mainSizer.Add(self.mainPanel,wx.EXPAND)
+		
+		self.mainPanel.SetBackgroundColour('grey')
+		self.panel = Panel(self.mainPanel, -1, (300,0), (724,400))
+
+		bSizer1 = wx.BoxSizer( wx.VERTICAL )
+		bSizer5 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.panel.SetBackgroundColour('black')
+		self.html_view = wx.html2.WebView.New(self.panel)
+		bSizer5.Add( self.html_view,1, wx.EXPAND|wx.ALL, 5)
 		dir_name=os.getcwd()+"/test.htm"
 		self.html_view.LoadURL(dir_name)
 		#self.html_view.SetPage("<html><body> hello </body></html>", "")
@@ -150,6 +57,24 @@ class GPSWindow(wx.Frame):
 		print("Waiting for messages...")
 		
 		self.timer.Start(400)
+		self.panel.SetSizer( bSizer5 )
+		
+		bSizer5.Fit(self.panel )
+		
+		self.panel.Layout()
+		
+		bSizer1.Add( self.panel, wx.EXPAND )
+		bSizer1.Fit(self.panel)
+		mainSizer.Fit(self.mainPanel)
+		
+		
+		self.Centre( wx.BOTH )
+		
+		
+		self.SetSizer( mainSizer )
+		self.Layout()
+		
+		#self.Centre( wx.BOTH )
 		self.Show()
 		
 	def OnTimer(self, event):
@@ -160,27 +85,7 @@ class GPSWindow(wx.Frame):
 		global coordinate2
 		scriptString = """moveMarker(new google.maps.LatLng(%s,%s),map,marker)""" % (str(coordinate1),str(coordinate2))
 		self.html_view.RunScript(scriptString)
-
 		
-class LogWindow(wx.MiniFrame):
-	def __init__(self, parent, id):
-		wx.MiniFrame.__init__(self,parent,id,'',size = (200,400), style = wx.DEFAULT_FRAME_STYLE)
-		panel=wx.Panel(self)
-		panel.SetBackgroundColour('grey')
-		self.Bind(wx.EVT_CLOSE,self.closewindow)
-		
-	def closewindow(self,event):
-		self.Destroy()
-		
-class OtherFlightsWindow(wx.MiniFrame):
-	def __init__(self, parent, id):
-		wx.MiniFrame.__init__(self,parent,id,'',size = (200,400), style = wx.DEFAULT_FRAME_STYLE)
-		panel=wx.Panel(self)
-		panel.SetBackgroundColour('grey')
-		self.Bind(wx.EVT_CLOSE,self.closewindow)
-		
-	def closewindow(self,event):
-		self.Destroy()
 
 class Icon:
     #'''Get/make marker icons at http://mapki.com/index.php?title=Icon_Image_Sets'''
@@ -277,11 +182,11 @@ class PyMap:
 		var infowindow;
 		function initialize() {
 			center = new google.maps.LatLng(0.0,0.0);
-			var mapOptions = {zoom: 4,center: center};
+			var mapOptions = {zoom: 1,center: center};
 			var image = {
 				url: 'PlaneImage.png',
 				// This marker is 20 pixels wide by 32 pixels tall.
-				size: new google.maps.Size(50, 50),
+				size: new google.maps.Size(1000, 1000),
 				// The origin for this image is 0,0.
 				origin: new google.maps.Point(0,0),
 				// The anchor for this image is the base of the flagpole at 0,32.
@@ -357,8 +262,6 @@ class PyMap:
 </html>
 		""" % self.GoogleMapPy()
 		return self.html
-
-
 		
 if __name__ == '__main__':
 
@@ -366,6 +269,6 @@ if __name__ == '__main__':
 	open('test.htm','wb').write(g.showhtml())   # generate test file
 	
 	app=wx.PySimpleApp()
-	frame = TestFrame(parent = None, id=-1)
+	frame = GPSWindow(parent = None, id=-1)
 	frame.Show()
 	app.MainLoop()

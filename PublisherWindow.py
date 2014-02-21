@@ -24,15 +24,15 @@ class TestFrame(wx.Frame):
 		port = os.getenv("ACTIVEMQ_PORT") or 61613
 
 
-		conn = stomp.Connection(host_and_ports = [(host, port)])
-		#conn = stomp.Connection(host_and_ports = [("35.9.22.201", port)])
+		#conn = stomp.Connection(host_and_ports = [(host, port)])
+		conn = stomp.Connection(host_and_ports = [("35.9.22.201", port)])
 		#conn = stomp.Connection(host_and_ports = [("10.0.1.17", port)])
 		conn.start()
 		conn.connect(login=user,passcode=password)
 		
 		textString = self.textBox.GetValue()
 
-		conn.send(body=textString, destination='topic/hello')
+		conn.send(body=textString, destination='TEST.FOO')
   
 
 		conn.disconnect()

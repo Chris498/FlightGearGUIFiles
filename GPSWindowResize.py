@@ -117,7 +117,10 @@ class FlightplanWindow(wx.MiniFrame):
 		
 	def closewindow(self,event):
 		self.Destroy()		
-	
+
+class Panel(wx.Panel):
+	def __init__(self,parent,id,pos,size):
+		wx.Panel.__init__(self,parent,id,pos,size)
 
 class GPSWindow(wx.Frame):
 	def __init__(self, parent, id,):  
@@ -125,9 +128,22 @@ class GPSWindow(wx.Frame):
 		#self.html_view = wx.html2.WebView.New(self)
 		#print g.showhtml()		
 		self.count = 1
-	
-		super(GPSWindow, self).__init__(parent, size=(350,365), style = wx.DEFAULT_FRAME_STYLE & ~wx.MAXIMIZE_BOX ^ wx.RESIZE_BORDER)
-		self.html_view = wx.html2.WebView.New(self)
+		
+		super(GPSWindow, self).__init__(parent, size=(1024,700), style = wx.DEFAULT_FRAME_STYLE & ~wx.MAXIMIZE_BOX ^ wx.RESIZE_BORDER)
+		self.mainPanel = wx.Panel(self)
+		
+		mainSizer = wx.BoxSizer(wx.VERTICAL)
+		mainSizer.Add(self.mainPanel,wx.EXPAND)
+		
+		self.mainPanel.SetBackgroundColour('grey')
+		self.panel = Panel(self.mainPanel, -1, (300,0), (724,400))
+
+		bSizer1 = wx.BoxSizer( wx.VERTICAL )
+		bSizer5 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.panel.SetBackgroundColour('black')
+		self.html_view = wx.html2.WebView.New(self.panel)
+		bSizer5.Add( self.html_view,1, wx.EXPAND|wx.ALL, 5)
 		dir_name=os.getcwd()+"/test.htm"
 		self.html_view.LoadURL(dir_name)
 		#self.html_view.SetPage("<html><body> hello </body></html>", "")
@@ -150,6 +166,24 @@ class GPSWindow(wx.Frame):
 		print("Waiting for messages...")
 		
 		self.timer.Start(400)
+		self.panel.SetSizer( bSizer5 )
+		
+		bSizer5.Fit(self.panel )
+		
+		self.panel.Layout()
+		
+		bSizer1.Add( self.panel, wx.EXPAND )
+		bSizer1.Fit(self.panel)
+		mainSizer.Fit(self.mainPanel)
+		
+		
+		self.Centre( wx.BOTH )
+		
+		
+		self.SetSizer( mainSizer )
+		self.Layout()
+		
+		#self.Centre( wx.BOTH )
 		self.Show()
 		
 	def OnTimer(self, event):
@@ -277,11 +311,11 @@ class PyMap:
 		var infowindow;
 		function initialize() {
 			center = new google.maps.LatLng(0.0,0.0);
-			var mapOptions = {zoom: 4,center: center};
+			var mapOptions = {zoom: 1,center: center};
 			var image = {
 				url: 'PlaneImage.png',
 				// This marker is 20 pixels wide by 32 pixels tall.
-				size: new google.maps.Size(50, 50),
+				size: new google.maps.Size(1000, 1000),
 				// The origin for this image is 0,0.
 				origin: new google.maps.Point(0,0),
 				// The anchor for this image is the base of the flagpole at 0,32.
