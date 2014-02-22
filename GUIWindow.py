@@ -16,28 +16,71 @@ class Panel(wx.Panel):
 class GPSWindow(wx.Frame):
 	def __init__(self, parent, id,):  
 		
-		#self.html_view = wx.html2.WebView.New(self)
-		#print g.showhtml()		
 		self.count = 1
 		
-		super(GPSWindow, self).__init__(parent, size=(1024,700), style = wx.DEFAULT_FRAME_STYLE & ~wx.MAXIMIZE_BOX ^ wx.RESIZE_BORDER)
-		self.mainPanel = wx.Panel(self)
-		
-		mainSizer = wx.BoxSizer(wx.VERTICAL)
-		mainSizer.Add(self.mainPanel,wx.EXPAND)
-		
-		self.mainPanel.SetBackgroundColour('grey')
-		self.panel = Panel(self.mainPanel, -1, (300,0), (724,400))
+		super(GPSWindow, self).__init__(parent, size=(1024,700), style = wx.DEFAULT_FRAME_STYLE)
 
-		bSizer1 = wx.BoxSizer( wx.VERTICAL )
-		bSizer5 = wx.BoxSizer( wx.HORIZONTAL )
+		gridSizer = wx.GridBagSizer(2,2)
 		
-		self.panel.SetBackgroundColour('black')
-		self.html_view = wx.html2.WebView.New(self.panel)
-		bSizer5.Add( self.html_view,1, wx.EXPAND|wx.ALL, 5)
+		TopHorizSizer = wx.BoxSizer(wx.HORIZONTAL)
+		LeftVertSizer = wx.BoxSizer(wx.VERTICAL)
+		RightVertSizer = wx.BoxSizer(wx.VERTICAL)
+		GPSSizer = wx.BoxSizer()
+		BottomSizer = wx.BoxSizer()
+		
+		self.MainPanel = wx.Panel(self)
+		self.MainPanel.SetBackgroundColour("orange")
+		LeftPanel = wx.Panel(self.MainPanel,-1)
+		LeftPanel.SetBackgroundColour("black")
+		
+
+
+		
+		BottomPanel = wx.Panel(self.MainPanel,-1)
+		BottomPanel.SetBackgroundColour("black")
+		GPSPanel = wx.Panel(self.MainPanel,-1)
+		GPSPanel.SetBackgroundColour("black")
+		
+		
+		self.html_view = wx.html2.WebView.New(GPSPanel)
 		dir_name=os.getcwd()+"/test.htm"
 		self.html_view.LoadURL(dir_name)
-		#self.html_view.SetPage("<html><body> hello </body></html>", "")
+		
+		GPSSizer.Add(self.html_view,1,wx.EXPAND|wx.ALL,5)
+		GPSPanel.SetSizer(GPSSizer)
+		
+		EnviInfoPanel = wx.Panel(LeftPanel,-1)
+		EnviInfoPanel.SetBackgroundColour("white")
+		
+		boldFont = wx.Font(14,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
+		EnviInfoText = wx.StaticText(EnviInfoPanel,label="\n\n  Environment Info\n\n  - Time of Day:\n      Noon\n  - Sky Conditions:\n      Clear Skies\n  - Temperature:\n      54 Degrees F\n  - Wind Speed:\n      8 Knots\n  - Wind Direction:\n      North East\n")
+		EnviInfoText.SetFont(boldFont)
+		
+		LeftVertSizer.Add(EnviInfoPanel,1,wx.EXPAND|wx.ALL,5)
+		
+		FlightInfoPanel = wx.Panel(BottomPanel,-1)
+		FlightInfoPanel.SetBackgroundColour("white")
+		FlightInfoText = wx.StaticText(FlightInfoPanel, label = "\n\n  Flight Info\n\n  - Latitude:  122.3478922   - Longitude:  37.456789   \n - Speed:  477.23 Knots \n  - Orientation:  North at 12 degrees\n  - Flight Time:  3hr 47min 12sec\n   - Current Time:  15:07:14")
+		FlightInfoText.SetFont(boldFont)
+		
+		BottomSizer.Add(FlightInfoPanel,1,wx.EXPAND|wx.ALL,5)
+		BottomPanel.SetSizer(BottomSizer)
+
+		#FlightInfoText = wx.TextCtrl(BottomPanel, -1, "Here is a looooooooooooooong line of text set in the control.\n\n" "The quick brown fox jumped over the lazy dog...",size=(700, 700), style=wx.TE_MULTILINE|wx.TE_PROCESS_ENTER)
+
+		#FlightInfoText.SetInsertionPoint(0)
+		RightVertSizer.Add(GPSPanel,2,wx.EXPAND)
+		RightVertSizer.Add(BottomPanel,1,wx.EXPAND)
+		
+		LeftPanel.SetSizer(LeftVertSizer)
+		
+		
+		TopHorizSizer.Add(LeftPanel,1,wx.EXPAND)
+		TopHorizSizer.Add(RightVertSizer,3,wx.EXPAND)
+		
+		gridSizer.Add(TopHorizSizer, pos=(4,4), span = (20,20), flag = wx.EXPAND)
+		self.MainPanel.SetSizer(TopHorizSizer)
+
 		
 		self.timer = wx.Timer(self)
 		self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
@@ -57,24 +100,7 @@ class GPSWindow(wx.Frame):
 		print("Waiting for messages...")
 		
 		self.timer.Start(400)
-		self.panel.SetSizer( bSizer5 )
-		
-		bSizer5.Fit(self.panel )
-		
-		self.panel.Layout()
-		
-		bSizer1.Add( self.panel, wx.EXPAND )
-		bSizer1.Fit(self.panel)
-		mainSizer.Fit(self.mainPanel)
-		
-		
-		self.Centre( wx.BOTH )
-		
-		
-		self.SetSizer( mainSizer )
-		self.Layout()
-		
-		#self.Centre( wx.BOTH )
+
 		self.Show()
 		
 	def OnTimer(self, event):

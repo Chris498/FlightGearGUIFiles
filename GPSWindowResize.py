@@ -168,7 +168,7 @@ class GPSWindow(wx.Frame):
 		self.timer.Start(400)
 		self.panel.SetSizer( bSizer5 )
 		
-		bSizer5.Fit(self.panel )
+		#bSizer5.Fit(self.panel )
 		
 		self.panel.Layout()
 		
