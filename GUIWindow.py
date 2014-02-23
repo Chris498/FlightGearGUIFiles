@@ -12,80 +12,124 @@ coordinate2 = 0.0
 class Panel(wx.Panel):
 	def __init__(self,parent,id,pos,size):
 		wx.Panel.__init__(self,parent,id,pos,size)
+		
+	def Update():
+		print("update Panel")
+
+		
+class EnvironmentPanelBackground(wx.Panel):
+	def __init__(self,parent,id):
+		wx.Panel.__init__(self,parent,id)
+		self.SetBackgroundColour("blue")
+		
+		EnviInfoPanel = EnvironmentPanel(self,-1)
+		
+		sizer = wx.BoxSizer(wx.VERTICAL)
+		
+		sizer.Add(EnviInfoPanel,1,wx.EXPAND|wx.ALL,5)
+		
+		self.SetSizer(sizer)
+		
+	def Update():
+		print("update EnvironmentPanelBackground")
+		
+class GPSPanel(wx.Panel):
+	def __init__(self,parent,id):
+		wx.Panel.__init__(self,parent,id)
+		self.SetBackgroundColour("grey")
+		GPSSizer = wx.BoxSizer()
+		parent.html_view = wx.html2.WebView.New(self)
+		dir_name = os.getcwd()+"/test.htm"
+		parent.html_view.LoadURL(dir_name)
+		GPSSizer.Add(parent.html_view,1,wx.EXPAND|wx.ALL,5)
+		self.SetSizer(GPSSizer)
+		
+	def Update():
+		print("update GPSPanel")
+
+class FlightStatusPanelBackground(wx.Panel):
+	def __init__(self,parent,id):
+		wx.Panel.__init__(self,parent,id)
+		self.SetBackgroundColour("green")
+		
+		FlightInfoPanel = FlightPanel(self,-1)
+		
+		sizer = wx.BoxSizer()
+		
+		sizer.Add(FlightInfoPanel,1,wx.EXPAND|wx.ALL,5)
+		
+		self.SetSizer(sizer)
+		
+	def Update():
+		print("update FlightStatusPanelBackground")
+		
+class EnvironmentPanel(wx.Panel):
+	def __init__(self,parent,id):
+		wx.Panel.__init__(self,parent,id)
+		self.SetBackgroundColour("white")
+		
+		boldFont = wx.Font(14,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
+
+		EnviInfoText = wx.StaticText(self,label="\n\n  Environment Info\n\n  - Time of Day:\n      Noon\n  - Sky Conditions:\n      Clear Skies\n  - Temperature:\n      54 Degrees F\n  - Wind Speed:\n      8 Knots\n  - Wind Direction:\n      North East\n")
+		EnviInfoText.SetFont(boldFont)		
+		
+	def Update():
+		print("update EnvironmentPanel")
+		
+class FlightPanel(wx.Panel):
+	def __init__(self,parent,id):
+		wx.Panel.__init__(self,parent,id)
+		self.SetBackgroundColour("white")
+		
+		boldFont = wx.Font(14,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
+		
+		FlightInfoText = wx.StaticText(self, label = "\n\n  Flight Info\n\n  - Latitude:  122.3478922   - Longitude:  37.456789   \n - Speed:  477.23 Knots \n  - Orientation:  North at 12 degrees\n  - Flight Time:  3hr 47min 12sec\n   - Current Time:  15:07:14")
+		FlightInfoText.SetFont(boldFont)
+		
+	def Update():
+		print("update FlightPanel")
+		
 
 class GPSWindow(wx.Frame):
 	def __init__(self, parent, id,):  
 		
-		self.count = 1
 		
 		super(GPSWindow, self).__init__(parent, size=(1024,700), style = wx.DEFAULT_FRAME_STYLE)
-
-		gridSizer = wx.GridBagSizer(2,2)
 		
+		#The top most sizer that splits the screen horizontally
 		TopHorizSizer = wx.BoxSizer(wx.HORIZONTAL)
-		LeftVertSizer = wx.BoxSizer(wx.VERTICAL)
+		
+		#The rest of the sizers
 		RightVertSizer = wx.BoxSizer(wx.VERTICAL)
 		GPSSizer = wx.BoxSizer()
-		BottomSizer = wx.BoxSizer()
 		
+		#The main panel all others will be parented to
 		self.MainPanel = wx.Panel(self)
 		self.MainPanel.SetBackgroundColour("orange")
-		LeftPanel = wx.Panel(self.MainPanel,-1)
-		LeftPanel.SetBackgroundColour("black")
-		
+		#The other sub panels
+		EnvironmentInfoBackground = EnvironmentPanelBackground(self.MainPanel,-1)
+		FlightInfoBackground = FlightStatusPanelBackground(self.MainPanel,-1)
+		GPS = GPSPanel(self.MainPanel,-1)
 
-
+		#add sub panels to the right sizer
+		RightVertSizer.Add(GPS,2,wx.EXPAND)
+		RightVertSizer.Add(FlightInfoBackground,1,wx.EXPAND)
 		
-		BottomPanel = wx.Panel(self.MainPanel,-1)
-		BottomPanel.SetBackgroundColour("black")
-		GPSPanel = wx.Panel(self.MainPanel,-1)
-		GPSPanel.SetBackgroundColour("black")
-		
-		
-		self.html_view = wx.html2.WebView.New(GPSPanel)
-		dir_name=os.getcwd()+"/test.htm"
-		self.html_view.LoadURL(dir_name)
-		
-		GPSSizer.Add(self.html_view,1,wx.EXPAND|wx.ALL,5)
-		GPSPanel.SetSizer(GPSSizer)
-		
-		EnviInfoPanel = wx.Panel(LeftPanel,-1)
-		EnviInfoPanel.SetBackgroundColour("white")
-		
-		boldFont = wx.Font(14,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
-		EnviInfoText = wx.StaticText(EnviInfoPanel,label="\n\n  Environment Info\n\n  - Time of Day:\n      Noon\n  - Sky Conditions:\n      Clear Skies\n  - Temperature:\n      54 Degrees F\n  - Wind Speed:\n      8 Knots\n  - Wind Direction:\n      North East\n")
-		EnviInfoText.SetFont(boldFont)
-		
-		LeftVertSizer.Add(EnviInfoPanel,1,wx.EXPAND|wx.ALL,5)
-		
-		FlightInfoPanel = wx.Panel(BottomPanel,-1)
-		FlightInfoPanel.SetBackgroundColour("white")
-		FlightInfoText = wx.StaticText(FlightInfoPanel, label = "\n\n  Flight Info\n\n  - Latitude:  122.3478922   - Longitude:  37.456789   \n - Speed:  477.23 Knots \n  - Orientation:  North at 12 degrees\n  - Flight Time:  3hr 47min 12sec\n   - Current Time:  15:07:14")
-		FlightInfoText.SetFont(boldFont)
-		
-		BottomSizer.Add(FlightInfoPanel,1,wx.EXPAND|wx.ALL,5)
-		BottomPanel.SetSizer(BottomSizer)
-
-		#FlightInfoText = wx.TextCtrl(BottomPanel, -1, "Here is a looooooooooooooong line of text set in the control.\n\n" "The quick brown fox jumped over the lazy dog...",size=(700, 700), style=wx.TE_MULTILINE|wx.TE_PROCESS_ENTER)
-
-		#FlightInfoText.SetInsertionPoint(0)
-		RightVertSizer.Add(GPSPanel,2,wx.EXPAND)
-		RightVertSizer.Add(BottomPanel,1,wx.EXPAND)
-		
-		LeftPanel.SetSizer(LeftVertSizer)
-		
-		
-		TopHorizSizer.Add(LeftPanel,1,wx.EXPAND)
+		#add the left sub panel and right sizer to the main horizontal sizer
+		TopHorizSizer.Add(EnvironmentInfoBackground,1,wx.EXPAND)
 		TopHorizSizer.Add(RightVertSizer,3,wx.EXPAND)
 		
-		gridSizer.Add(TopHorizSizer, pos=(4,4), span = (20,20), flag = wx.EXPAND)
+		#set the main panel's sizer
 		self.MainPanel.SetSizer(TopHorizSizer)
 
-		
+		#initiate timer and timer event
 		self.timer = wx.Timer(self)
 		self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
 		
-		
+		#------------------------------------------------------------------------
+		###
+		### The Stomp/broker information
+		###
 		user = os.getenv("ACTIVEMQ_USER") or "admin"
 		password = os.getenv("ACTIVEMQ_PASSWORD") or "password"
 		host = os.getenv("ACTIVEMQ_HOST") or "localhost"
@@ -98,14 +142,15 @@ class GPSWindow(wx.Frame):
 		conn2.connect(login=user,passcode=password)
 		conn2.subscribe(destination="TEST.FOO", id=1, ack='auto')
 		print("Waiting for messages...")
+		#-----------------------------------------------------------------------------
 		
 		self.timer.Start(400)
-
-		self.Show()
-		
+	
+	#called on every timer event, updates the main panel
 	def OnTimer(self, event):
 		self.updateTheView()
 
+	#updates main panel which will update all sub panels
 	def updateTheView(self):
 		global coordinate1
 		global coordinate2
