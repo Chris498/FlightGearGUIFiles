@@ -13,7 +13,7 @@ import re
 
 def parse(string):
     
-    playerRecordsList = re.split("-",string)
+    playerRecordsList = re.split("&",string)
     print("length of list is: %s"% len(playerRecordsList))
     playerPropDictList = []
     
