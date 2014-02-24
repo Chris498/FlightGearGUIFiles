@@ -15,7 +15,7 @@ class TestFrame(wx.Frame):
 		self.Bind(wx.EVT_BUTTON,self.sendButton,send)	
 		self.Bind(wx.EVT_CLOSE,self.closewindow)
 		wx.StaticText(self.panel, -1, "Message to Send:", pos=(10, 12))
-		self.textBox = wx.TextCtrl(self.panel, -1, "Test it out and see", size=(125, -1), pos = (115,10))
+		self.textBox = wx.TextCtrl(self.panel, -1, "Test it out and see", size=(300, -1), pos = (115,10))
 		
 	def sendButton(self,event):
 		user = os.getenv("ACTIVEMQ_USER") or "admin"
@@ -24,11 +24,12 @@ class TestFrame(wx.Frame):
 		port = os.getenv("ACTIVEMQ_PORT") or 61613
 
 
-		#conn = stomp.Connection(host_and_ports = [(host, port)])
-		conn = stomp.Connection(host_and_ports = [("35.9.22.201", port)])
+		conn = stomp.Connection(host_and_ports = [(host, port)])
+		#conn = stomp.Connection(host_and_ports = [("35.9.22.201", port)])
 		#conn = stomp.Connection(host_and_ports = [("10.0.1.17", port)])
 		conn.start()
 		conn.connect(login=user,passcode=password)
+		print("send")
 		
 		textString = self.textBox.GetValue()
 

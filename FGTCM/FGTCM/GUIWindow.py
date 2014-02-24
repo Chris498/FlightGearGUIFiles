@@ -5,6 +5,9 @@ import os
 import stomp
 import wx.html2
 
+from FGObject import FGObject
+import FGParser
+
 #global coordinates for the plane marker
 coordinate1 = 0.0
 coordinate2 = 0.0
@@ -13,25 +16,25 @@ class Panel(wx.Panel):
 	def __init__(self,parent,id,pos,size):
 		wx.Panel.__init__(self,parent,id,pos,size)
 		
-	def Update():
-		print("update Panel")
-
+	def Update(self):
+		return
 		
 class EnvironmentPanelBackground(wx.Panel):
 	def __init__(self,parent,id):
 		wx.Panel.__init__(self,parent,id)
 		self.SetBackgroundColour("blue")
 		
-		EnviInfoPanel = EnvironmentPanel(self,-1)
+		self.EnviInfoPanel = EnvironmentPanel(self,-1)
 		
 		sizer = wx.BoxSizer(wx.VERTICAL)
 		
-		sizer.Add(EnviInfoPanel,1,wx.EXPAND|wx.ALL,5)
+		sizer.Add(self.EnviInfoPanel,1,wx.EXPAND|wx.ALL,5)
 		
 		self.SetSizer(sizer)
 		
-	def Update():
-		print("update EnvironmentPanelBackground")
+	def Update(self):
+		#print("update EnvironmentPanelBackground")
+		self.EnviInfoPanel.Update()
 		
 class GPSPanel(wx.Panel):
 	def __init__(self,parent,id):
@@ -44,24 +47,38 @@ class GPSPanel(wx.Panel):
 		GPSSizer.Add(parent.html_view,1,wx.EXPAND|wx.ALL,5)
 		self.SetSizer(GPSSizer)
 		
-	def Update():
-		print("update GPSPanel")
+		#self.markers = {}
+		
+	#def Update(self,FGObjects):
+		#for name,playerDict in FGObjects.viewitems():
+			#if name in self.markers:
+				#print("%s in markers"%name)
+			#else:
+				#print("%s not in markers"%name)
+				#self.markers[name] = playerDict
+		#print("update GPSPanel")
+		
+	def UpdateMarker(self,name,FGObjects):
+		print("updating the marker")
+	
+	def CreateMarker(self,name,FGObjects):
+		print("creating the marker")
 
 class FlightStatusPanelBackground(wx.Panel):
 	def __init__(self,parent,id):
 		wx.Panel.__init__(self,parent,id)
 		self.SetBackgroundColour("green")
 		
-		FlightInfoPanel = FlightPanel(self,-1)
+		self.FlightInfoPanel = FlightPanel(self,-1)
 		
 		sizer = wx.BoxSizer()
 		
-		sizer.Add(FlightInfoPanel,1,wx.EXPAND|wx.ALL,5)
+		sizer.Add(self.FlightInfoPanel,1,wx.EXPAND|wx.ALL,5)
 		
 		self.SetSizer(sizer)
 		
-	def Update():
-		print("update FlightStatusPanelBackground")
+	def Update(self):
+		self.FlightInfoPanel.Update()
 		
 class EnvironmentPanel(wx.Panel):
 	def __init__(self,parent,id):
@@ -73,8 +90,8 @@ class EnvironmentPanel(wx.Panel):
 		EnviInfoText = wx.StaticText(self,label="\n\n  Environment Info\n\n  - Time of Day:\n      Noon\n  - Sky Conditions:\n      Clear Skies\n  - Temperature:\n      54 Degrees F\n  - Wind Speed:\n      8 Knots\n  - Wind Direction:\n      North East\n")
 		EnviInfoText.SetFont(boldFont)		
 		
-	def Update():
-		print("update EnvironmentPanel")
+	def Update(self):
+		return
 		
 class FlightPanel(wx.Panel):
 	def __init__(self,parent,id):
@@ -86,8 +103,8 @@ class FlightPanel(wx.Panel):
 		FlightInfoText = wx.StaticText(self, label = "\n\n  Flight Info\n\n  - Latitude:  122.3478922   - Longitude:  37.456789   \n - Speed:  477.23 Knots \n  - Orientation:  North at 12 degrees\n  - Flight Time:  3hr 47min 12sec\n   - Current Time:  15:07:14")
 		FlightInfoText.SetFont(boldFont)
 		
-	def Update():
-		print("update FlightPanel")
+	def Update(self):
+		return
 		
 
 class GPSWindow(wx.Frame):
@@ -107,16 +124,16 @@ class GPSWindow(wx.Frame):
 		self.MainPanel = wx.Panel(self)
 		self.MainPanel.SetBackgroundColour("orange")
 		#The other sub panels
-		EnvironmentInfoBackground = EnvironmentPanelBackground(self.MainPanel,-1)
-		FlightInfoBackground = FlightStatusPanelBackground(self.MainPanel,-1)
-		GPS = GPSPanel(self.MainPanel,-1)
+		self.EnvironmentInfoBackground = EnvironmentPanelBackground(self.MainPanel,-1)
+		self.FlightInfoBackground = FlightStatusPanelBackground(self.MainPanel,-1)
+		self.GPS = GPSPanel(self.MainPanel,-1)
 
 		#add sub panels to the right sizer
-		RightVertSizer.Add(GPS,2,wx.EXPAND)
-		RightVertSizer.Add(FlightInfoBackground,1,wx.EXPAND)
+		RightVertSizer.Add(self.GPS,2,wx.EXPAND)
+		RightVertSizer.Add(self.FlightInfoBackground,1,wx.EXPAND)
 		
 		#add the left sub panel and right sizer to the main horizontal sizer
-		TopHorizSizer.Add(EnvironmentInfoBackground,1,wx.EXPAND)
+		TopHorizSizer.Add(self.EnvironmentInfoBackground,1,wx.EXPAND)
 		TopHorizSizer.Add(RightVertSizer,3,wx.EXPAND)
 		
 		#set the main panel's sizer
@@ -126,25 +143,8 @@ class GPSWindow(wx.Frame):
 		self.timer = wx.Timer(self)
 		self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
 		
-		#------------------------------------------------------------------------
-		###
-		### The Stomp/broker information
-		###
-		user = os.getenv("ACTIVEMQ_USER") or "admin"
-		password = os.getenv("ACTIVEMQ_PASSWORD") or "password"
-		host = os.getenv("ACTIVEMQ_HOST") or "localhost"
-		port = os.getenv("ACTIVEMQ_PORT") or 61613
-		conn2 = stomp.Connection(host_and_ports = [(host, port)])
-		#conn2 = stomp.Connection(host_and_ports = [("35.9.22.201", port)])
-		#conn = stomp.Connection(host_and_ports = [("10.0.1.17", port)])
-		conn2.set_listener('', MyListener(conn2,self))
-		conn2.start()
-		conn2.connect(login=user,passcode=password)
-		conn2.subscribe(destination="TEST.FOO", id=1, ack='auto')
-		print("Waiting for messages...")
-		#-----------------------------------------------------------------------------
-		
 		self.timer.Start(400)
+		self.fgObjects = {}
 	
 	#called on every timer event, updates the main panel
 	def OnTimer(self, event):
@@ -152,10 +152,35 @@ class GPSWindow(wx.Frame):
 
 	#updates main panel which will update all sub panels
 	def updateTheView(self):
-		global coordinate1
-		global coordinate2
+		#global coordinate1
+		#global coordinate2
+		#self.GPS.Update(self.fgObjects)
+		self.EnvironmentInfoBackground.Update()
+		self.FlightInfoBackground.Update()
 		scriptString = """moveMarker(new google.maps.LatLng(%s,%s),map,marker)""" % (str(coordinate1),str(coordinate2))
-		self.html_view.RunScript(scriptString)
+		self.MainPanel.html_view.RunScript(scriptString)
+
+		
+	def updateFGObjs(self, string):
+		if string is not None:
+			fgPlayerDictsList = FGParser.parse(string)
+			if len(fgPlayerDictsList) == 0:
+				return
+			for playerDict in fgPlayerDictsList:
+				print(len(fgPlayerDictsList))
+				if "playername" not in playerDict:
+					continue
+				else:
+					playerid = playerDict["playername"]
+					if playerid in self.fgObjects:
+						self.fgObjects[playerid].updateFromMessage(playerDict)
+						self.GPS.UpdateMarker(playerid,self.fgObjects)
+						print("update -------------- %s"% playerDict)
+					else:
+						newPlayer = FGObject(playerid, playerDict)
+						self.fgObjects[playerid] = newPlayer
+						self.GPS.CreateMarker(playerid,self.fgObjects)
+						print("create-------------------- %s"% playerDict)
 		
 
 class Icon:
@@ -179,37 +204,34 @@ class MyListener(object):
   def __init__(self, conn, frame):
     self.conn = conn
     self.count = 0
+    self.start = time.time()
     self.frame = frame
   
   def on_error(self, headers, message):
     print('received an error %s' % message)
 
-  def on_message(self, headers, message):	
+  def on_message(self, headers, message):
+    self.frame.updateFGObjs(message)
     if message == "SHUTDOWN":
-      conn.disconnect()
+      diff = time.time() - self.start
+      print('disconnecting')
+      self.conn.disconnect()
       sys.exit(0)
       
     else:
+		if self.count==0:
+			self.start = time.time()
+		self.count += 1
 		coordinates = message.split()
 		
-		global coordinate1
-		global coordinate2
-		coordinate1 = float(coordinates[0])
-		coordinate2 = float(coordinates[1])
+		#global coordinate1
+		#global coordinate2
+		#coordinate1 = float(coordinates[0])
+		#coordinate2 = float(coordinates[1])
 		
 		
-		#g = PyMap()                         # creates an icon & map by default
-		#icon2 = Icon('icon2')               # create an additional icon
-		#icon2.image = "PlaneImage.png"
-		#g.addicon(icon2)
-		#g.key = "ABQIAAAAQQRAsOk3uqvy3Hwwo4CclBTrVPfEE8Ms0qPwyRfPn-DOTlpaLBTvTHRCdf2V6KbzW7PZFYLT8wFD0A" # you will get your own key
-		#g.maps[0].zoom = 5
-		#r = [coordinate1,coordinate2,'','icon2']              # icon2.id, specify the icon but no text
-		#g.maps[0].setpoint(r)
-		#open('test.htm','wb').write(g.showhtml())   # generate test file
-		
-		print(coordinate1)
-		print(coordinate2)
+		#print(coordinate1)
+		#print(coordinate2)
 		
 		print("Received message: %s" % message)
 	  
@@ -339,7 +361,28 @@ if __name__ == '__main__':
 	g = PyMap()                         
 	open('test.htm','wb').write(g.showhtml())   # generate test file
 	
+
+	
 	app=wx.PySimpleApp()
 	frame = GPSWindow(parent = None, id=-1)
+	
+	#------------------------------------------------------------------------
+	###
+	### The Stomp/broker information
+	###
+	user = os.getenv("ACTIVEMQ_USER") or "admin"
+	password = os.getenv("ACTIVEMQ_PASSWORD") or "password"
+	host = os.getenv("ACTIVEMQ_HOST") or "localhost"
+	port = os.getenv("ACTIVEMQ_PORT") or 61613
+	conn2 = stomp.Connection(host_and_ports = [(host, port)])
+	#conn2 = stomp.Connection(host_and_ports = [("35.9.22.201", port)])
+	#conn = stomp.Connection(host_and_ports = [("10.0.1.17", port)])
+	conn2.set_listener('', MyListener(conn2,frame))
+	conn2.start()
+	conn2.connect(login=user,passcode=password)
+	conn2.subscribe(destination="TEST.FOO", id=1, ack='auto')
+	print("Waiting for messages...")
+	#-----------------------------------------------------------------------------
+	
 	frame.Show()
 	app.MainLoop()
