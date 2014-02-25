@@ -100,29 +100,51 @@
 			//infowindow.open(map,marker);
 		}
 		
-		function addMarker(location) {
-			alert("addmarker");
-			var marker2 = new google.maps.Marker({
-				position: location,
-				map: map,
-				icon: image
-			});
-			//map.panTo(location);
-			markers.push(marker2);
-		}
-		function addMarker2(lat, lon) {
+
+		function addMarker(lat, lon,name) {
 			var location = new google.maps.LatLng(lat,lon);
-			var marker2 = new google.maps.Marker({
+			var marker = new google.maps.Marker({
 				position: location,
 				map: map,
-				icon: image
+				icon: image,
+				title: name
 			});
-			//map.panTo(location);
-			markers.push(marker2);
+			markers.push(marker);
+			//alert("added marker");
 		}
 		
-		function updateMarker(lat, lon) {
-			addMarker2(lat, lon);
+		function updateMarker(lat, lon,name) {
+			var theIndex;
+			var found = 0
+			if(markers.length == 0) {
+				addMarker(lat,lon,name);
+			}
+			else {
+				for(var i= 0;i<markers.length;i++)
+				{
+					//alert(String(name));
+					if(markers[i].title == name)
+					{
+						//alert("exists");
+						
+						var newPosition = new google.maps.LatLng(lat,lon);
+						if((parseFloat(markers[i].getPosition().lat()) == parseFloat(lat)) && (parseFloat(markers[i].getPosition().lng()) == parseFloat(lon))) {
+							//alert("same pos");
+						}
+						else {
+							//alert(markers[i].getPosition().lat());
+							//alert(lat);
+							markers[i].setPosition(newPosition);
+						}
+						//markers[i].setPosition(newPosition);
+						found = 1
+					}
+				  //alert(markers[i].title);
+				}
+				if(found == 0) {
+					addMarker(lat,lon,name);
+				}
+			}
 		}
 		
 		function createAlert() {

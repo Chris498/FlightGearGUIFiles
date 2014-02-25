@@ -149,7 +149,7 @@ class GPSWindow(wx.Frame):
 		self.timer = wx.Timer(self)
 		self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
 		
-		self.timer.Start(400)
+		self.timer.Start(500)
 		self.fgObjects = {}
 	
 	#called on every timer event, updates the main panel
@@ -165,8 +165,9 @@ class GPSWindow(wx.Frame):
 		self.FlightInfoBackground.Update()
 		#scriptString = """moveMarker(new google.maps.LatLng(%s,%s),map,marker)""" % (str(coordinate1),str(coordinate2))
 		#self.MainPanel.html_view.RunScript(scriptString)
-		scriptString = """deleteMarkers()"""
-		self.MainPanel.html_view.RunScript(scriptString)
+		
+		#scriptString = """deleteMarkers()"""
+		#self.MainPanel.html_view.RunScript(scriptString)
 		for name,playerDict in self.fgObjects.iteritems():
 			#print(name)
 			lat = ""
@@ -179,7 +180,7 @@ class GPSWindow(wx.Frame):
 				if(property == "longitude-deg"):
 					lon = value
 					#print(lon)
-			scriptString = """updateMarker(%s,%s)""" % (str(lat),str(lon))
+			scriptString = """updateMarker(%s,%s,"%s")""" % (str(lat),str(lon),str(name))
 			self.MainPanel.html_view.RunScript(scriptString)
 			
 			
@@ -197,33 +198,24 @@ class GPSWindow(wx.Frame):
 	def updateFGObjs(self, string):
 		if string is not None:
 			fgPlayerDictsList = FGParser.parse(string)
-			#print("here")
 			if len(fgPlayerDictsList) == 0:
 				return
 			for playerDict in fgPlayerDictsList:
-				if "playername:" not in playerDict:
-					#print("not in")
+				if "playername" not in playerDict:
 					continue
 				else:
-					playerid = playerDict["playername:"]
+					playerid = playerDict["playername"]
 					if playerid in self.fgObjects:
 						self.fgObjects[playerid].updateFromMessage(playerDict)
-						#self.GPS.UpdateMarker(playerid,self.fgObjects)
-						#print("update -------------- %s"% playerDict)
 					else:
 						newPlayer = FGObject(playerid, playerDict)
 						self.fgObjects[playerid] = newPlayer
-						#self.GPS.CreateMarker(playerid,self.fgObjects)
-						#commandString = """addMarker(new google.maps.LatLng(%s,%s))"""%(str(2.0),str(10.0))
-						#self.MainPanel.html_view.RunScript(commandString)
-						#print("create-------------------- %s"% playerDict)
 		
 
 class Icon:
     #'''Get/make marker icons at http://mapki.com/index.php?title=Icon_Image_Sets'''
     def __init__(self,id='icon'):
         self.id = id
-        #self.image = ""     #uses default Google Maps icon
         self.shadow = ""
 		
 		
@@ -260,16 +252,6 @@ class MyListener(object):
 		self.count += 1
 		coordinates = message.split()
 		
-		#global coordinate1
-		#global coordinate2
-		#coordinate1 = float(coordinates[0])
-		#coordinate2 = float(coordinates[1])
-		
-		
-		#print(coordinate1)
-		#print(coordinate2)
-		
-		#print("Received message: %s" % message)
 	  
 
    
@@ -390,29 +372,51 @@ class PyMap:
 			//infowindow.open(map,marker);
 		}
 		
-		function addMarker(location) {
-			alert("addmarker");
-			var marker2 = new google.maps.Marker({
-				position: location,
-				map: map,
-				icon: image
-			});
-			//map.panTo(location);
-			markers.push(marker2);
-		}
-		function addMarker2(lat, lon) {
+
+		function addMarker(lat, lon,name) {
 			var location = new google.maps.LatLng(lat,lon);
-			var marker2 = new google.maps.Marker({
+			var marker = new google.maps.Marker({
 				position: location,
 				map: map,
-				icon: image
+				icon: image,
+				title: name
 			});
-			//map.panTo(location);
-			markers.push(marker2);
+			markers.push(marker);
+			//alert("added marker");
 		}
 		
-		function updateMarker(lat, lon) {
-			addMarker2(lat, lon);
+		function updateMarker(lat, lon,name) {
+			var theIndex;
+			var found = 0
+			if(markers.length == 0) {
+				addMarker(lat,lon,name);
+			}
+			else {
+				for(var i= 0;i<markers.length;i++)
+				{
+					//alert(String(name));
+					if(markers[i].title == name)
+					{
+						//alert("exists");
+						
+						var newPosition = new google.maps.LatLng(lat,lon);
+						if((parseFloat(markers[i].getPosition().lat()) == parseFloat(lat)) && (parseFloat(markers[i].getPosition().lng()) == parseFloat(lon))) {
+							//alert("same pos");
+						}
+						else {
+							//alert(markers[i].getPosition().lat());
+							//alert(lat);
+							markers[i].setPosition(newPosition);
+						}
+						//markers[i].setPosition(newPosition);
+						found = 1
+					}
+				  //alert(markers[i].title);
+				}
+				if(found == 0) {
+					addMarker(lat,lon,name);
+				}
+			}
 		}
 		
 		function createAlert() {
