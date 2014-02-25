@@ -13,12 +13,13 @@ import re
 
 def parse(string):
     
-    playerRecordsList = re.split("&",string)
-    print("length of list is: %s"% len(playerRecordsList))
+    playerRecordsList = re.split("\n+",string)
+    #print("length of list is: %s"% len(playerRecordsList))
     playerPropDictList = []
     
     
     for prop in playerRecordsList:
+        print("a prop: %s"%prop)
         props = re.split(",",prop)
         
         propDict = {}

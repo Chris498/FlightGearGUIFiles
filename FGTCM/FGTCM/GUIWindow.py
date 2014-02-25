@@ -42,29 +42,30 @@ class GPSPanel(wx.Panel):
 		self.parent = parent
 		self.SetBackgroundColour("grey")
 		GPSSizer = wx.BoxSizer()
-		parent.html_view = wx.html2.WebView.New(self)
+		self.parent.html_view = wx.html2.WebView.New(self)
 		dir_name = os.getcwd()+"/test.htm"
-		parent.html_view.LoadURL(dir_name)
-		GPSSizer.Add(parent.html_view,1,wx.EXPAND|wx.ALL,5)
+		self.parent.html_view.LoadURL(dir_name)
+		GPSSizer.Add(self.parent.html_view,1,wx.EXPAND|wx.ALL,5)
 		self.SetSizer(GPSSizer)
-		#scriptString = """addMarker(new google.maps.LatLng(%s,%s),map,marker)""" % (str(10.1),str(20.1))
+		#scriptString = """addMarker(new google.maps.LatLng(%s,%s))""" % (str(10.1),str(20.1))
 		#parent.html_view.RunScript(scriptString)
+		#self.HTML_VIEW = parent.html_view
 		
-	def UpdateMarker(self,name,FGObjects,mainpanel):
+	def UpdateMarker(self,name,FGObjects):
 		fgobject = FGObjects[name]
 		print("updating the marker")
 	
-	def CreateMarker(self,name,FGObjects,mainpanel):
+	def CreateMarker(self,name,FGObjects):
 		fgobject = FGObjects[name]
 		coordinateLat = fgobject.prop_list['latitude-deg']
 		coordinateLong = fgobject.prop_list['longitude-deg']
 		print("coordinateLat %s"%coordinateLat)
 		print("coordinateLong %s"%coordinateLong)
-		scriptString = """moveMarker(new google.maps.LatLng(%s,%s),map,marker)""" % (str(20.0),str(30.0))
-		#print(scriptString)
-		#mainpanel.html_view.RunScript(scriptString)
+		scriptString = """addMarker(new google.maps.LatLng(%s,%s))""" % (str(20.0),str(30.0))
+		print(scriptString)
+		#self.parent.html_view.RunScript(scriptString)
 		#self.parent.CallJavaScriptFunction(scriptString)
-		return scriptString
+		#return scriptString
 
 		print("creating the marker")
 
@@ -123,6 +124,7 @@ class GPSWindow(wx.Frame):
 		#The rest of the sizers
 		RightVertSizer = wx.BoxSizer(wx.VERTICAL)
 		GPSSizer = wx.BoxSizer()
+		#self.html_view = wx.html2.WebView.New(self)
 		
 		#The main panel all others will be parented to
 		self.MainPanel = wx.Panel(self)
@@ -163,10 +165,30 @@ class GPSWindow(wx.Frame):
 		self.FlightInfoBackground.Update()
 		#scriptString = """moveMarker(new google.maps.LatLng(%s,%s),map,marker)""" % (str(coordinate1),str(coordinate2))
 		#self.MainPanel.html_view.RunScript(scriptString)
-		#scriptString = """addMarker(new google.maps.LatLng(%s,%s))"""%(str(coordinate1),str(coordinate2))
-		#self.MainPanel.html_view.RunScript(scriptString)
+		scriptString = """deleteMarkers()"""
+		self.MainPanel.html_view.RunScript(scriptString)
+		for name,playerDict in self.fgObjects.iteritems():
+			#print(name)
+			lat = ""
+			lon = ""
+			for property,value in playerDict.prop_list.iteritems():
+				#print("%s: %s"%(property,value))
+				if(property == "latitude-deg"):
+					lat = value
+					#print(lat)
+				if(property == "longitude-deg"):
+					lon = value
+					#print(lon)
+			scriptString = """updateMarker(%s,%s)""" % (str(lat),str(lon))
+			self.MainPanel.html_view.RunScript(scriptString)
+			
+			
 		coordinate1 +=1
 		coordinate2 +=2
+		
+		#scriptString = """updateMarkers(new google.maps.LatLng(%s,%s))"""%(str(coordinate1),str(coordinate2))
+		#self.MainPanel.html_view.RunScript(scriptString)
+		
 	def callJavaScriptFunction(stringCommand):
 		#self.MainPanel.html_view.RunScript(stringCommand)
 		print("call this function")
@@ -175,26 +197,26 @@ class GPSWindow(wx.Frame):
 	def updateFGObjs(self, string):
 		if string is not None:
 			fgPlayerDictsList = FGParser.parse(string)
-			print("here")
+			#print("here")
 			if len(fgPlayerDictsList) == 0:
 				return
 			for playerDict in fgPlayerDictsList:
-				if "playername" not in playerDict:
-					print("not in")
+				if "playername:" not in playerDict:
+					#print("not in")
 					continue
 				else:
-					playerid = playerDict["playername"]
+					playerid = playerDict["playername:"]
 					if playerid in self.fgObjects:
 						self.fgObjects[playerid].updateFromMessage(playerDict)
-						self.GPS.UpdateMarker(playerid,self.fgObjects,self.MainPanel)
-						print("update -------------- %s"% playerDict)
+						#self.GPS.UpdateMarker(playerid,self.fgObjects)
+						#print("update -------------- %s"% playerDict)
 					else:
 						newPlayer = FGObject(playerid, playerDict)
 						self.fgObjects[playerid] = newPlayer
-						#commandString = self.GPS.CreateMarker(playerid,self.fgObjects,self.MainPanel)
+						#self.GPS.CreateMarker(playerid,self.fgObjects)
 						#commandString = """addMarker(new google.maps.LatLng(%s,%s))"""%(str(2.0),str(10.0))
 						#self.MainPanel.html_view.RunScript(commandString)
-						print("create-------------------- %s"% playerDict)
+						#print("create-------------------- %s"% playerDict)
 		
 
 class Icon:
@@ -247,7 +269,7 @@ class MyListener(object):
 		#print(coordinate1)
 		#print(coordinate2)
 		
-		print("Received message: %s" % message)
+		#print("Received message: %s" % message)
 	  
 
    
@@ -283,7 +305,7 @@ class PyMap:
 		self.js = """<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 		<script>
 		var map;
-		var marker;
+		//var marker;
 		var center;
 		var poly;
 		var infowindow;
@@ -302,7 +324,7 @@ class PyMap:
 				anchor: new google.maps.Point(10, 10)
 			};
 			map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
-			marker = new google.maps.Marker({position: center, map: map,icon: image, animation: google.maps.Animation.DROP});
+			//marker = new google.maps.Marker({position: center, map: map,icon: image, animation: google.maps.Animation.DROP});
 			var polyOptions = {
 			strokeColor: '#FF00FF',
 			strokeOpacity: 1.0,
@@ -322,17 +344,40 @@ class PyMap:
 			}
 			infowindow = new google.maps.InfoWindow();
 			
-			google.maps.event.addListener(marker, 'click', function() {
-				infowindow.setContent(createInfoWindowContent());
-				infowindow.open(map,marker);
-			});
+			//google.maps.event.addListener(marker, 'click', function() {
+			//	infowindow.setContent(createInfoWindowContent());
+			//	infowindow.open(map,marker);
+			//});
 			
 			google.maps.event.addListener(map,'click',function(event) {
-				addMarker(event.latLng);
+				addMarker(event.latLng,'click');
 			});
 			
 
 
+		}
+		
+		// Sets the map on all markers in the array.
+		function setAllMap(map) {
+			for (var i = 0; i < markers.length; i++) {
+				markers[i].setMap(map);
+			}
+		}		
+
+		// Removes the markers from the map, but keeps them in the array.
+		function clearMarkers() {
+			setAllMap(null);
+		}
+
+		// Shows any markers currently in the array.
+		function showMarkers() {
+			setAllMap(map);
+		}
+
+		// Deletes all markers in the array by removing references to them.
+		function deleteMarkers() {
+			clearMarkers();
+			markers = [];
 		}
 
 		function moveMarker(position, map, marker) {
@@ -346,14 +391,32 @@ class PyMap:
 		}
 		
 		function addMarker(location) {
+			alert("addmarker");
 			var marker2 = new google.maps.Marker({
 				position: location,
 				map: map,
-				title: "my title",
 				icon: image
 			});
-			map.panTo(location);
-			//markers.push(marker2);
+			//map.panTo(location);
+			markers.push(marker2);
+		}
+		function addMarker2(lat, lon) {
+			var location = new google.maps.LatLng(lat,lon);
+			var marker2 = new google.maps.Marker({
+				position: location,
+				map: map,
+				icon: image
+			});
+			//map.panTo(location);
+			markers.push(marker2);
+		}
+		
+		function updateMarker(lat, lon) {
+			addMarker2(lat, lon);
+		}
+		
+		function createAlert() {
+			alert("Alert created");
 		}
 
 		google.maps.event.addDomListener(window, 'load', initialize);
