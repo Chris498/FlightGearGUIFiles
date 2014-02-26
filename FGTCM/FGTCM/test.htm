@@ -21,18 +21,33 @@
 		var infowindow;
 		var image;
 		var markers = [];
+		var planeSymbol;
+		var planeSymbolSelected;
 		function initialize() {
-			center = new google.maps.LatLng(0.0,0.0);
-			var mapOptions = {zoom: 1,center: center};
+			center = new google.maps.LatLng(37.6069,-122.381);
+			var mapOptions = {zoom: 8,center: center};//,mapTypeId: google.maps.MapTypeId.TERRAIN};
 			image = {
 				url: 'PlaneImage.png',
 				// This marker is 20 pixels wide by 32 pixels tall.
-				size: new google.maps.Size(1000, 1000),
+				size: new google.maps.Size(20, 20),
 				// The origin for this image is 0,0.
 				origin: new google.maps.Point(0,0),
 				// The anchor for this image is the base of the flagpole at 0,32.
 				anchor: new google.maps.Point(10, 10)
 			};
+			planeSymbol = {
+				path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+				scale: 4,
+				strokeWeight: 3,
+				strokeColor: 'red'
+			};
+			
+			planeSymbolSelected = {
+				path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+				scale: 4,
+				strokeWeight: 3,
+				strokeColor: 'green'
+			}
 			map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
 			//marker = new google.maps.Marker({position: center, map: map,icon: image, animation: google.maps.Animation.DROP});
 			var polyOptions = {
@@ -45,26 +60,74 @@
 			
 			//var contentString = ['coordinates','Latitude: ' + marker.getPosition().lat(), 'Longitude: '+marker.getPosition().lng()].join('<br>');
 			
-			function createInfoWindowContent(){
-				return[
-					'Coordinates:',
-					'Latitude: ' + marker.getPosition().lat(),
-					'Longitude: ' + marker.getPosition().lng()
-				].join('<br>');
-			}
-			infowindow = new google.maps.InfoWindow();
+			//function createInfoWindowContent(){
+			//	return[
+			//		'Coordinates:',
+			//		'Latitude: ' + marker.getPosition().lat(),
+			//		'Longitude: ' + marker.getPosition().lng()
+			//	].join('<br>');
+			//}
+			//infowindow = new google.maps.InfoWindow();
 			
 			//google.maps.event.addListener(marker, 'click', function() {
 			//	infowindow.setContent(createInfoWindowContent());
 			//	infowindow.open(map,marker);
 			//});
 			
-			google.maps.event.addListener(map,'click',function(event) {
-				addMarker(event.latLng,'click');
-			});
+			//google.maps.event.addListener(map,'click',function(event) {
+			//	addMarker(event.latLng,'click');
+			//});
+			
+			
+			//--------------------------------------------------------------------------------
 			
 
 
+			  var lineCoordinates = [
+				new google.maps.LatLng(22.291, 153.027),
+				new google.maps.LatLng(18.291, 153.027)
+			  ];
+
+			  // Define the symbol, using one of the predefined paths ('CIRCLE')
+			  // supplied by the Google Maps JavaScript API.
+			  var lineSymbol = {
+				path: google.maps.SymbolPath.CIRCLE,
+				scale: 8,
+				strokeColor: '#393',
+				stokeOpacity: 1
+			  };
+
+			  // Create the polyline and add the symbol to it via the 'icons' property.
+			//  line = new google.maps.Polyline({
+				//path: lineCoordinates,
+				//strokeWeight: 0,
+			//	icons: [{
+			//	  icon: lineSymbol,
+			//	  offset: '100%'
+			//	}],
+			//	map: map
+			//  });
+
+			  //animateCircle();
+			
+			
+			//--------------------------------------------------------------------------------
+			
+
+
+		}
+		
+		
+		function animateCircle() {
+		    var count = 0;
+			window.setInterval(function() {
+			  count = (count + 1) % 15;
+
+			  var icons = line.get('icons');
+			  icons[0].offset = (count / .15) + '%';
+			  //icons[0].offset = '50%';
+			  line.set('icons', icons);
+		  }, 20);
 		}
 		
 		// Sets the map on all markers in the array.
@@ -106,14 +169,19 @@
 			var marker = new google.maps.Marker({
 				position: location,
 				map: map,
-				icon: image,
-				title: name
+				icon: planeSymbol,
+				title: name,
+				optimized: false,
+				pastLat: lat,
+				pastLon: lon
+				//rotation: 180
 			});
+			//alert(marker.pastLat);
 			markers.push(marker);
 			//alert("added marker");
 		}
 		
-		function updateMarker(lat, lon,name) {
+		function updateMarker(lat, lon,name,selected) {
 			var theIndex;
 			var found = 0
 			if(markers.length == 0) {
@@ -132,9 +200,32 @@
 							//alert("same pos");
 						}
 						else {
-							//alert(markers[i].getPosition().lat());
-							//alert(lat);
+
 							markers[i].setPosition(newPosition);
+							if(selected == 'yes') {
+								markers[i].setIcon(planeSymbolSelected);
+							}
+							else {
+								markers[i].setIcon(planeSymbol);
+							}
+							//alert("else");
+
+							
+							var lineCoords = [new google.maps.LatLng(parseFloat(markers[i].pastLat), parseFloat(markers[i].pastLon)),new google.maps.LatLng(parseFloat(lat), parseFloat(lon))];
+							var planeLine = new google.maps.Polyline({
+								path: lineCoords,
+								strokeWeight: 0,
+								icons: [{
+									icon: marker[i].icon,
+									offset: '100%'
+								}],
+								map: map
+							});
+							markers[i].pastLat = lat;
+							markers[i].pastLon = lon;
+							//animateLine(planeLine);
+							
+							
 						}
 						//markers[i].setPosition(newPosition);
 						found = 1
@@ -146,6 +237,18 @@
 				}
 			}
 		}
+		
+		function animateLine(planeLine) {
+			var count = 0;
+			window.setInterval(function() {
+				//count = (count + 1)%15;
+				
+				//var icons = planeLine.get('icons');
+				//icons[0].offset = (count /.15)+'%';
+				//planeLine.set('icons',icons);
+				},20);
+		}
+		
 		
 		function createAlert() {
 			alert("Alert created");

@@ -19,7 +19,7 @@ def parse(string):
     
     
     for prop in playerRecordsList:
-        print("a prop: %s"%prop)
+        print("received prop: %s"%prop)
         props = re.split(",",prop)
         
         propDict = {}
