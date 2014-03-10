@@ -154,13 +154,10 @@
 		}
 
 		function moveMarker(position, map, marker) {
-			//infowindow.close();
 			var path = poly.getPath();
 			path.push(position);
 			marker.setPosition(position);
 			map.panTo(position);
-			//infowindow.setContent(createInfoWindowContent());
-			//infowindow.open(map,marker);
 		}
 		
 
@@ -173,12 +170,11 @@
 				title: name,
 				optimized: false,
 				pastLat: lat,
-				pastLon: lon
+				pastLon: lon,
+				animation: google.maps.Animation.DROP
 				//rotation: 180
 			});
-			//alert(marker.pastLat);
 			markers.push(marker);
-			//alert("added marker");
 		}
 		
 		function updateMarker(lat, lon,name,selected) {
@@ -190,14 +186,11 @@
 			else {
 				for(var i= 0;i<markers.length;i++)
 				{
-					//alert(String(name));
 					if(markers[i].title == name)
 					{
-						//alert("exists");
 						
 						var newPosition = new google.maps.LatLng(lat,lon);
 						if((parseFloat(markers[i].getPosition().lat()) == parseFloat(lat)) && (parseFloat(markers[i].getPosition().lng()) == parseFloat(lon))) {
-							//alert("same pos");
 						}
 						else {
 
@@ -208,7 +201,6 @@
 							else {
 								markers[i].setIcon(planeSymbol);
 							}
-							//alert("else");
 
 							
 							var lineCoords = [new google.maps.LatLng(parseFloat(markers[i].pastLat), parseFloat(markers[i].pastLon)),new google.maps.LatLng(parseFloat(lat), parseFloat(lon))];
@@ -223,14 +215,11 @@
 							});
 							markers[i].pastLat = lat;
 							markers[i].pastLon = lon;
-							//animateLine(planeLine);
 							
 							
 						}
-						//markers[i].setPosition(newPosition);
 						found = 1
 					}
-				  //alert(markers[i].title);
 				}
 				if(found == 0) {
 					addMarker(lat,lon,name);
@@ -241,11 +230,7 @@
 		function animateLine(planeLine) {
 			var count = 0;
 			window.setInterval(function() {
-				//count = (count + 1)%15;
 				
-				//var icons = planeLine.get('icons');
-				//icons[0].offset = (count /.15)+'%';
-				//planeLine.set('icons',icons);
 				},20);
 		}
 		

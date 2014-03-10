@@ -23,67 +23,102 @@ class Panel(wx.Panel):
 	def Update(self):
 		return
 		
-class EnvironmentPanelBackground(wx.Panel):
+class EnvironmentPanel(wx.Panel):
 	def __init__(self,parent,id):
 		wx.Panel.__init__(self,parent,id)
 		self.SetBackgroundColour("black")
-		
-		self.EnviInfoPanel = EnvironmentPanel(self,-1)
-		
-		sizer = wx.BoxSizer()
-		
-		sizer.Add(self.EnviInfoPanel,1,wx.EXPAND|wx.ALL,5)
-		
-		self.SetSizer(sizer)
-		
-	def Update(self):
-		#print("update EnvironmentPanelBackground")
-		self.EnviInfoPanel.Update()
+		self.SetDoubleBuffered(True)
+		self.FlightInfoPanel = scrolled.ScrolledPanel(self, -1)
+		self.FlightInfoPanel.SetupScrolling()
 
-class PlaneSelectPanelBackground(wx.Panel):
+		self.FlightInfoPanel.SetBackgroundColour("white")
+		
+		#self.FlightInfoPanel = FlightPanel(self,-1)
+		
+		sizer = wx.BoxSizer(wx.VERTICAL)
+		sizer2 = wx.BoxSizer(wx.VERTICAL)
+		sizer3 = wx.BoxSizer(wx.VERTICAL)
+		#textSizer = wx.BoxSizer()
+		
+		self.boldFont = wx.Font(14,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
+		#sizer = wx.BoxSizer()
+		
+		sizer2.Add(sizer3,1,wx.EXPAND)
+		self.FlightInfoPanel.SetSizer(sizer2)
+		self.FlightInfoPanel.Layout()
+		sizer2.Fit(self.FlightInfoPanel)
+		sizer.Add(self.FlightInfoPanel,1,wx.EXPAND)
+		self.SetSizer(sizer)
+		self.FlightInfoPanel.Layout()
+		
+		self.Centre()
+		self.FlightInfoText = wx.StaticText(self.FlightInfoPanel, label = "\n\n  Environment Info\n\n  - Time of Day:\n      Noon\n  - Sky Conditions:\n      Clear Skies\n  - Temperature:\n      54 Degrees F\n  - Wind Speed:\n      8 Knots\n  - Wind Direction:\n      North East\n")
+		self.FlightInfoText.SetFont(self.boldFont)
+		
+		sizer3.Add(self.FlightInfoText)
+		
+		# sizer.Add(self.FlightInfoPanel,1,wx.EXPAND)
+		# #sizer.Layout()
+		# #sizer.FitInside()
+		# #sizer.Add(textSizer,1,wx.EXPAND)
+		
+		# self.SetSizer(sizer)
+		# #sizer.Fit(self)
+		# self.FlightInfoPanel.FitInside()
+		# self.FlightInfoPanel.SetupScrolling()
+		self.FlightInfoPanel.SetAutoLayout(1)
+		#self.FlightInfoPanel.Layout()
+
+		
+#	def Update(self):
+		#self.GetParent().SendSizeEvent()
+	#	self.FlightInfoPanel.Update()
+
+class PlaneSelectPanel(wx.Panel):
 	def __init__(self,parent,id):
 		wx.Panel.__init__(self,parent,id)
 		self.SetBackgroundColour("Black")
 		self.parent = parent
 		self.FlightInfoClass = ""
-		self.panel = wx.Panel(self, -1)
+		self.panel = scrolled.ScrolledPanel(self, -1)
+		self.panel.SetupScrolling()
 		self.panel.SetBackgroundColour("white")
 		mainSizer = wx.BoxSizer(wx.VERTICAL)
 		self.boldFont = wx.Font(14,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
 
-		#button = wx.Button(self.panel,-1,"Button")
-
 		self.vbox = wx.BoxSizer(wx.VERTICAL)
-		#self.vbox.Add(button)
 
-		#add_btn = wx.Button(self.panel,-1,"Add")
-		#add_btn.Bind(wx.EVT_BUTTON, self.add)
 
-		hbox = wx.BoxSizer(wx.HORIZONTAL)
-		#hbox.Add(add_btn)
 
 		main_vbox = wx.BoxSizer(wx.VERTICAL)
-		main_vbox.Add(self.vbox,1,wx.EXPAND|wx.ALL,5)
-		main_vbox.Add(hbox)
+		main_vbox.Add(self.vbox,1,wx.EXPAND)
 
 		self.panel.SetSizer(main_vbox)
-		mainSizer.Add(self.panel,1,wx.EXPAND|wx.ALL,5)
+		self.panel.Layout()
+		main_vbox.Fit(self.panel)
+		mainSizer.Add(self.panel,1,wx.EXPAND)
 		self.SetSizer(mainSizer)
 		self.panel.Layout()
 		
 		self.group1_ctrls = []
 
 		self.Centre()
-		self.Show(True)
+
 		
-		self.SelectionInfo = wx.StaticText(self.panel, label = "  Select A Flight")
+		self.SelectionInfo = wx.StaticText(self.panel, label = "  Select A Flight:")
 		self.SelectionInfo.SetFont(self.boldFont)
 		self.vbox.Add(self.SelectionInfo)
 
-	def add(self,event):
+		self.panel.SetAutoLayout(1)
+		self.panel.SendSizeEvent()
+		self.GetParent().SendSizeEvent()
+
+
+
+	#def add(self,event):
 		#self.vbox.Add((wx.RadioButton(self.panel,-1,"Button")))
 		#self.panel.Layout()
-		self.addRadio("wahoo")
+		#self.addRadio("wahoo")
 		
 	def addRadio(self,name):
 		found = 0
@@ -101,6 +136,8 @@ class PlaneSelectPanelBackground(wx.Panel):
 				radioButton.SetValue(1)
 			else:
 				radioButton.SetValue(0)
+		self.Layout()
+		#self.GetParent().SendSizeEvent()
 	
 	def OnGroup1Select( self, event ):
 		global currentDisplayFlight
@@ -108,93 +145,12 @@ class PlaneSelectPanelBackground(wx.Panel):
 		print('Group1 %s selected\n' % radio_selected.GetLabel() )
 		currentDisplayFlight = radio_selected.GetLabel()
 		#self.FlightInfoClass.updateText(radio_selected.GetLabel(),
-		#self.parent.EnvironmentInfoBackground
+		#self.parent.EnvironmentInfo
 		
 
 	def updateFlightInfoObject(self,object):
 		self.FlightInfoClass = object
 		
-
-class PlaneSelectPanel(scrolled.ScrolledPanel):
-	def __init__(self,parent,id):
-		scrolled.ScrolledPanel.__init__(self,parent,id)
-		#self.panel = scrolled.ScrolledPanel(self)
-		self.SetBackgroundColour("white")
-		#boldFont = wx.Font(14,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
-		self.vbox = wx.BoxSizer(wx.VERTICAL)
-		self.grid1 = wx.FlexGridSizer( cols=1 )
-		self.group1_ctrls = []
-		
-		#self.ScrolledPanel = PlaneSelectPanel
-		
-		#radio1 = wx.RadioButton( self, -1, " Radio1 ", style = wx.RB_GROUP )
-		#radio2 = wx.RadioButton( self, -1, " Radio2 " )
-		# radio3 = wx.RadioButton( self, -1, " Radio3 " )
-		
-		# self.group1_ctrls.append(radio1)
-		# self.group1_ctrls.append(radio2)
-		# self.group1_ctrls.append(radio3)
-		
-		# radio4 = wx.RadioButton( self, -1, " Radio1 ", style = wx.RB_GROUP )
-		# radio5 = wx.RadioButton( self, -1, " Radio2 " )
-		# radio6 = wx.RadioButton( self, -1, " Radio3 " )
-		
-		# self.group1_ctrls.append(radio4)
-		# self.group1_ctrls.append(radio5)
-		# self.group1_ctrls.append(radio6)
-		
-		# radio7 = wx.RadioButton( self, -1, " Radio1 ", style = wx.RB_GROUP )
-		# radio8 = wx.RadioButton( self, -1, " Radio2 " )
-		# radio9 = wx.RadioButton( self, -1, " Radio3 " )
-		
-		# self.group1_ctrls.append(radio7)
-		# self.group1_ctrls.append(radio8)
-		# self.group1_ctrls.append(radio9)
-		
-		# radio10 = wx.RadioButton( self, -1, " Radio1 ", style = wx.RB_GROUP )
-		# radio11 = wx.RadioButton( self, -1, " Radio2 " )
-		# radio12 = wx.RadioButton( self, -1, " Radio3 " )
-		
-		# self.group1_ctrls.append(radio10)
-		# self.group1_ctrls.append(radio11)
-		# self.group1_ctrls.append(radio12)
-		
-		#for radio in self.group1_ctrls:
-			#self.grid1.Add( radio, 0, wx.ALIGN_CENTRE|wx.LEFT|wx.RIGHT|wx.TOP, 5 )
-			
-		# self.desc = wx.StaticText(self, -1,"\n  Select a Flight:")
-		# self.desc.SetForegroundColour("Black")
-		# self.desc.SetFont(boldFont)
-		
-		# self.vbox.Add(self.desc, 0, wx.ALIGN_LEFT|wx.ALL, 5)
-		# self.box1 = wx.BoxSizer(wx.VERTICAL)
-		# self.box1.Add( self.grid1, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		# self.vbox.Add( self.box1, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )		
-		
-
-		
-		self.SetSizer(self.vbox)
-		self.vbox.Fit(self)
-		self.SetAutoLayout(1)
-		self.SetupScrolling()
-		
-		# for radio in self.group1_ctrls:
-			# self.Bind(wx.EVT_RADIOBUTTON, self.OnGroup1Select, radio )
-			
-		# for radio in self.group1_ctrls:
-		# radio.SetValue(0)
-	
-			
-	def OnGroup1Select(self,event):
-		radio_selected = event.GetEventObject()
-		
-	def updateButtons():
-		return
-
-
-
-	def Update(self):
-		return	
 
 class GPSPanel(wx.Panel):
 	def __init__(self,parent,id):
@@ -205,7 +161,7 @@ class GPSPanel(wx.Panel):
 		self.parent.html_view = wx.html2.WebView.New(self)
 		dir_name = os.getcwd()+"/test.htm"
 		self.parent.html_view.LoadURL(dir_name)
-		GPSSizer.Add(self.parent.html_view,1,wx.EXPAND|wx.ALL,5)
+		GPSSizer.Add(self.parent.html_view,1,wx.EXPAND)
 		self.SetSizer(GPSSizer)
 		#scriptString = """addMarker(new google.maps.LatLng(%s,%s))""" % (str(10.1),str(20.1))
 		#parent.html_view.RunScript(scriptString)
@@ -229,98 +185,112 @@ class GPSPanel(wx.Panel):
 
 		#print("creating the marker")
 
-class FlightStatusPanelBackground(wx.Panel):
-	def __init__(self,parent,id):
-		wx.Panel.__init__(self,parent,id)
-		self.SetBackgroundColour("black")
-		
-		self.FlightInfoPanel = FlightPanel(self,-1)
-		
-		sizer = wx.BoxSizer(wx.VERTICAL)
-		
-		sizer.Add(self.FlightInfoPanel,1,wx.EXPAND|wx.ALL,5)
-		
-		self.SetSizer(sizer)
-		sizer.Fit(self)
-		
-	def Update(self):
-		self.FlightInfoPanel.Update()
-		
-class EnvironmentPanel(wx.Panel):
-	def __init__(self,parent,id):
-		wx.Panel.__init__(self,parent,id)
-		self.SetBackgroundColour("white")
-		
-		boldFont = wx.Font(14,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
-
-		EnviInfoText = wx.StaticText(self,label="\n\n  Environment Info\n\n  - Time of Day:\n      Noon\n  - Sky Conditions:\n      Clear Skies\n  - Temperature:\n      54 Degrees F\n  - Wind Speed:\n      8 Knots\n  - Wind Direction:\n      North East\n")
-		EnviInfoText.SetFont(boldFont)		
-		
-	def Update(self):
-		return
-		
 class FlightPanel(wx.Panel):
 	def __init__(self,parent,id):
 		wx.Panel.__init__(self,parent,id)
+		self.SetBackgroundColour("black")
 		self.SetDoubleBuffered(True)
-		self.SetBackgroundColour("white")
+		self.FlightInfoPanel = scrolled.ScrolledPanel(self, -1)
+		self.FlightInfoPanel.SetupScrolling()
+
+		self.FlightInfoPanel.SetBackgroundColour("white")
+		
+		#self.FlightInfoPanel = FlightPanel(self,-1)
+		
+		sizer = wx.BoxSizer(wx.VERTICAL)
+		sizer2 = wx.BoxSizer(wx.VERTICAL)
+		sizer3 = wx.BoxSizer(wx.VERTICAL)
+		#textSizer = wx.BoxSizer()
 		
 		self.boldFont = wx.Font(14,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
 		#sizer = wx.BoxSizer()
-		self.FlightInfoText = wx.StaticText(self, label = "\n  Flight Info\n\n  - Flight Name:  \n  - Latitude:     - Longitude:     \n - Speed:   \n  - Orientation:  \n  - Flight Time:  \n   - Current Time:")
+		
+		sizer2.Add(sizer3,1,wx.EXPAND)
+		self.FlightInfoPanel.SetSizer(sizer2)
+		self.FlightInfoPanel.Layout()
+		sizer2.Fit(self.FlightInfoPanel)
+		sizer.Add(self.FlightInfoPanel,1,wx.EXPAND)
+		self.SetSizer(sizer)
+		self.FlightInfoPanel.Layout()
+		
+		self.Centre()
+		self.FlightInfoText = wx.StaticText(self.FlightInfoPanel, label = "\n  Flight Info\n\n  - Flight Name:  \n  - Latitude:     - Longitude:     \n - Speed:   \n  - Orientation:  \n  - Altitude:   \n  - Fuel:  \n  - Flight Time:  \n   - Current Time:")
 		self.FlightInfoText.SetFont(self.boldFont)
-		#sizer.Add(FlightInfoText,0,wx.EXPAND)
-		#self.SetSizer(sizer)
+		
+		sizer3.Add(self.FlightInfoText)
+		
+		# sizer.Add(self.FlightInfoPanel,1,wx.EXPAND)
+		# #sizer.Layout()
+		# #sizer.FitInside()
+		# #sizer.Add(textSizer,1,wx.EXPAND)
+		
+		# self.SetSizer(sizer)
+		# #sizer.Fit(self)
+		# self.FlightInfoPanel.FitInside()
+		# self.FlightInfoPanel.SetupScrolling()
+		self.FlightInfoPanel.SetAutoLayout(1)
+		#self.FlightInfoPanel.Layout()
+
+		
+#	def Update(self):
+		#self.GetParent().SendSizeEvent()
+	#	self.FlightInfoPanel.Update()
 		
 	def updateText(self,name,lat,lon,elapsedTime):
 		#print("update the text")
+
 		currentTime = datetime.now()
-		self.FlightInfoText.SetLabel("\n  Flight Info\n\n  - Flight Name:  %s  \n  - Latitude:  %s  - Longitude:  %s   \n  - Speed:   \n  - Orientation: \n  - Flight Time:  %s\n  - Current Time:  %s"%(name,lat,lon,elapsedTime,currentTime))
+		self.FlightInfoText.SetLabel("\n  Flight Info\n\n  - Flight Name:  %s  \n  - Latitude:  %s  - Longitude:  %s   \n  - Speed:   \n  - Orientation: \n  - Altitude:   \n  - Fuel:  \n  - Flight Time:  %s\n  - Current Time:  %s"%(name,lat,lon,elapsedTime,currentTime))
+
 		
-	def Update(self):
-		return
+
 		
 
 class GPSWindow(wx.Frame):
 	def __init__(self, parent, id,):  
 		
 		
-		super(GPSWindow, self).__init__(parent, size=(1024,700), style = wx.DEFAULT_FRAME_STYLE)
+		super(GPSWindow, self).__init__(parent, size=(1024,700), style = wx.DEFAULT_FRAME_STYLE)#^wx.RESIZE_BORDER)
 		
 		#The top most sizer that splits the screen horizontally
 		TopHorizSizer = wx.BoxSizer(wx.HORIZONTAL)
 		
 		#The rest of the sizers
-		RightVertSizer = wx.BoxSizer(wx.VERTICAL)
+		self.RightVertSizer = wx.BoxSizer(wx.VERTICAL)
 		LeftVertSizer = wx.BoxSizer(wx.VERTICAL)
 		GPSSizer = wx.BoxSizer()
 		#self.html_view = wx.html2.WebView.New(self)
 		
 		#The main panel all others will be parented to
 		self.MainPanel = wx.Panel(self)
-		self.MainPanel.SetBackgroundColour("orange")
+		self.MainPanel.SetBackgroundColour("black")
 		#The other sub panels
-		self.EnvironmentInfoBackground = EnvironmentPanelBackground(self.MainPanel,-1)
-		self.FlightInfoBackground = FlightStatusPanelBackground(self.MainPanel,-1)
+		self.EnvironmentInfo = EnvironmentPanel(self.MainPanel,-1)
+		self.FlightInfo = FlightPanel(self.MainPanel,-1)
 		self.GPS = GPSPanel(self.MainPanel,-1)
-		self.PlaneSelectPanelBackground = PlaneSelectPanelBackground(self.MainPanel,-1)
-		self.PlaneSelectPanelBackground.updateFlightInfoObject(self.FlightInfoBackground.FlightInfoPanel)
+		self.PlaneSelectPanel = PlaneSelectPanel(self.MainPanel,-1)
+		self.PlaneSelectPanel.updateFlightInfoObject(self.FlightInfo.FlightInfoPanel)
 
 		#add sub panels to the right sizer
-		RightVertSizer.Add(self.GPS,2,wx.EXPAND)
-		RightVertSizer.Add(self.FlightInfoBackground,1,wx.EXPAND)
+		self.RightVertSizer.Add(self.GPS,2,wx.EXPAND|wx.ALL,5)
+		self.RightVertSizer.Add(self.FlightInfo,1,wx.EXPAND|wx.BOTTOM|wx.RIGHT|wx.LEFT,5)#|wx.ALL,5)
 		
-		LeftVertSizer.Add(self.EnvironmentInfoBackground,2,wx.EXPAND)
-		LeftVertSizer.Add(self.PlaneSelectPanelBackground,1,wx.EXPAND)
+		LeftVertSizer.Add(self.EnvironmentInfo,2,wx.EXPAND|wx.LEFT|wx.TOP|wx.BOTTOM,5)#|wx.ALL,5)
+		LeftVertSizer.Add(self.PlaneSelectPanel,1,wx.EXPAND|wx.BOTTOM|wx.LEFT,5)#|wx.ALL,5)
 		
-		RightVertSizer.Layout()
+		#self.RightVertSizer.Layout()
 		
 		#add the left sub panel and right sizer to the main horizontal sizer
 		TopHorizSizer.Add(LeftVertSizer,1,wx.EXPAND)
-		TopHorizSizer.Add(RightVertSizer,3,wx.EXPAND)
+		TopHorizSizer.Add(self.RightVertSizer,3,wx.EXPAND)
 		
 		#set the main panel's sizer
 		self.MainPanel.SetSizer(TopHorizSizer)
+		self.MainPanel.Fit()
+		#self.MainPanel.SetAutoLayout(1)
+		#self.SendSizeEvent()
+		
+		#self.SendSizeEvent()
 
 		#initiate timer and timer event
 		self.timer = wx.Timer(self)
@@ -332,6 +302,10 @@ class GPSWindow(wx.Frame):
 	#called on every timer event, updates the main panel
 	def OnTimer(self, event):
 		self.updateTheView()
+		
+	#def OnSize(self,event):
+		#self.RightVertSizer.Layout()
+		#self.Layout()
 
 	#updates main panel which will update all sub panels
 	def updateTheView(self):
@@ -339,8 +313,8 @@ class GPSWindow(wx.Frame):
 		global coordinate2
 		
 		#self.GPS.Update(self.fgObjects)
-		self.EnvironmentInfoBackground.Update()
-		self.FlightInfoBackground.Update()
+		self.EnvironmentInfo.Update()
+		self.FlightInfo.Update()
 		#scriptString = """moveMarker(new google.maps.LatLng(%s,%s),map,marker)""" % (str(coordinate1),str(coordinate2))
 		#self.MainPanel.html_view.RunScript(scriptString)
 		
@@ -374,14 +348,14 @@ class GPSWindow(wx.Frame):
 			selected = self.fgObjects[name].prop_list['selected']
 			scriptString = """updateMarker(%s,%s,"%s","%s")""" % (str(lat),str(lon),str(name),selected)
 			self.MainPanel.html_view.RunScript(scriptString)
-			self.PlaneSelectPanelBackground.addRadio(name)
+			self.PlaneSelectPanel.addRadio(name)
 
 			global currentDisplayFlight
 			if(name == currentDisplayFlight):
 				#print("matched" + name)
 				self.fgObjects[name].prop_list['selected'] = "yes"
-				self.FlightInfoBackground.FlightInfoPanel.updateText(name,lat,lon,self.fgObjects[name].prop_list['timeElapsed'])
-				#self.PlaneSelectPanelBackground.addRadio(name)
+				self.FlightInfo.updateText(name,lat,lon,self.fgObjects[name].prop_list['timeElapsed'])
+				#self.PlaneSelectPanel.addRadio(name)
 			else:
 				self.fgObjects[name].prop_list['selected'] = "no"
 			
@@ -413,7 +387,7 @@ class GPSWindow(wx.Frame):
 						newPlayer = FGObject(playerid, playerDict)
 						self.fgObjects[playerid] = newPlayer
 						#if(playerid == 'Player'):
-							#self.PlaneSelectPanelBackground.addRadio(str(playerid))
+							#self.PlaneSelectPanel.addRadio(str(playerid))
 							#print("done")
 						
 	def distance_on_unit_sphere(self,lat1, long1, lat2, long2):
@@ -660,13 +634,10 @@ class PyMap:
 		}
 
 		function moveMarker(position, map, marker) {
-			//infowindow.close();
 			var path = poly.getPath();
 			path.push(position);
 			marker.setPosition(position);
 			map.panTo(position);
-			//infowindow.setContent(createInfoWindowContent());
-			//infowindow.open(map,marker);
 		}
 		
 
@@ -679,12 +650,11 @@ class PyMap:
 				title: name,
 				optimized: false,
 				pastLat: lat,
-				pastLon: lon
+				pastLon: lon,
+				animation: google.maps.Animation.DROP
 				//rotation: 180
 			});
-			//alert(marker.pastLat);
 			markers.push(marker);
-			//alert("added marker");
 		}
 		
 		function updateMarker(lat, lon,name,selected) {
@@ -696,14 +666,11 @@ class PyMap:
 			else {
 				for(var i= 0;i<markers.length;i++)
 				{
-					//alert(String(name));
 					if(markers[i].title == name)
 					{
-						//alert("exists");
 						
 						var newPosition = new google.maps.LatLng(lat,lon);
 						if((parseFloat(markers[i].getPosition().lat()) == parseFloat(lat)) && (parseFloat(markers[i].getPosition().lng()) == parseFloat(lon))) {
-							//alert("same pos");
 						}
 						else {
 
@@ -714,7 +681,6 @@ class PyMap:
 							else {
 								markers[i].setIcon(planeSymbol);
 							}
-							//alert("else");
 
 							
 							var lineCoords = [new google.maps.LatLng(parseFloat(markers[i].pastLat), parseFloat(markers[i].pastLon)),new google.maps.LatLng(parseFloat(lat), parseFloat(lon))];
@@ -729,14 +695,11 @@ class PyMap:
 							});
 							markers[i].pastLat = lat;
 							markers[i].pastLon = lon;
-							//animateLine(planeLine);
 							
 							
 						}
-						//markers[i].setPosition(newPosition);
 						found = 1
 					}
-				  //alert(markers[i].title);
 				}
 				if(found == 0) {
 					addMarker(lat,lon,name);
@@ -747,11 +710,7 @@ class PyMap:
 		function animateLine(planeLine) {
 			var count = 0;
 			window.setInterval(function() {
-				//count = (count + 1)%15;
 				
-				//var icons = planeLine.get('icons');
-				//icons[0].offset = (count /.15)+'%';
-				//planeLine.set('icons',icons);
 				},20);
 		}
 		
