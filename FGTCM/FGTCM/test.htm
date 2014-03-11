@@ -21,6 +21,7 @@
 		var infowindow;
 		var image;
 		var markers = [];
+		var symbols = [];
 		var planeSymbol;
 		var planeSymbolSelected;
 		function initialize() {
@@ -163,21 +164,31 @@
 
 		function addMarker(lat, lon,name) {
 			var location = new google.maps.LatLng(lat,lon);
+			symbol = {
+				path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+				scale: 4,
+				strokeWeight: 3,
+				strokeColor: 'red',
+				rotation: 0
+			};
 			var marker = new google.maps.Marker({
 				position: location,
 				map: map,
-				icon: planeSymbol,
+				icon: symbol,
 				title: name,
 				optimized: false,
 				pastLat: lat,
 				pastLon: lon,
 				animation: google.maps.Animation.DROP
-				//rotation: 180
 			});
 			markers.push(marker);
 		}
 		
-		function updateMarker(lat, lon,name,selected) {
+		function addSymbol() {
+			//var symbol = new planeSymbol;
+		}
+		
+		function updateMarker(lat, lon,name,heading,selected) {
 			var theIndex;
 			var found = 0
 			if(markers.length == 0) {
@@ -190,17 +201,35 @@
 					{
 						
 						var newPosition = new google.maps.LatLng(lat,lon);
-						if((parseFloat(markers[i].getPosition().lat()) == parseFloat(lat)) && (parseFloat(markers[i].getPosition().lng()) == parseFloat(lon))) {
-						}
-						else {
+						//if((parseFloat(markers[i].getPosition().lat()) == parseFloat(lat)) && (parseFloat(markers[i].getPosition().lng()) == parseFloat(lon))) {
+						//	markers[i].icon.rotation = parseFloat(heading);
+						//}
+						//else {
 
-							markers[i].setPosition(newPosition);
 							if(selected == 'yes') {
-								markers[i].setIcon(planeSymbolSelected);
+								symbol = {
+									path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+									scale: 4,
+									strokeWeight: 3,
+									strokeColor: 'green',
+									rotation: heading
+								};
+								markers[i].setIcon(symbol);
 							}
 							else {
-								markers[i].setIcon(planeSymbol);
+								symbol = {
+									path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+									scale: 4,
+									strokeWeight: 3,
+									strokeColor: 'red',
+									rotation: heading
+								};
+								markers[i].setIcon(symbol);
 							}
+
+							markers[i].setPosition(newPosition);
+							//markers[i].setIcon(symbol);
+							
 
 							
 							var lineCoords = [new google.maps.LatLng(parseFloat(markers[i].pastLat), parseFloat(markers[i].pastLon)),new google.maps.LatLng(parseFloat(lat), parseFloat(lon))];
@@ -217,12 +246,13 @@
 							markers[i].pastLon = lon;
 							
 							
-						}
+						//}
 						found = 1
 					}
 				}
 				if(found == 0) {
 					addMarker(lat,lon,name);
+					addSymbol();
 				}
 			}
 		}

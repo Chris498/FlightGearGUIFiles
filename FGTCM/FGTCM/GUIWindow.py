@@ -34,15 +34,12 @@ class EnvironmentPanel(wx.Panel):
 
 		self.FlightInfoPanel.SetBackgroundColour("white")
 		
-		#self.FlightInfoPanel = FlightPanel(self,-1)
 		
 		sizer = wx.BoxSizer(wx.VERTICAL)
 		sizer2 = wx.BoxSizer(wx.VERTICAL)
 		sizer3 = wx.BoxSizer(wx.VERTICAL)
-		#textSizer = wx.BoxSizer()
 		
 		self.boldFont = wx.Font(14,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
-		#sizer = wx.BoxSizer()
 		
 		sizer2.Add(sizer3,1,wx.EXPAND)
 		self.FlightInfoPanel.SetSizer(sizer2)
@@ -58,25 +55,12 @@ class EnvironmentPanel(wx.Panel):
 		
 		sizer3.Add(self.EnvironmentInfoText)
 		
-		# sizer.Add(self.FlightInfoPanel,1,wx.EXPAND)
-		# #sizer.Layout()
-		# #sizer.FitInside()
-		# #sizer.Add(textSizer,1,wx.EXPAND)
-		
-		# self.SetSizer(sizer)
-		# #sizer.Fit(self)
-		# self.FlightInfoPanel.FitInside()
-		# self.FlightInfoPanel.SetupScrolling()
 		self.FlightInfoPanel.SetAutoLayout(1)
-		#self.FlightInfoPanel.Layout()
 		
 	def UpdateText(self,weatherScenario,skyConditions,temperature,windSpeed,windDirection):
 		self.EnvironmentInfoText.SetLabel("\n\n  Environment Info\n\n  - Weather Scenario:\n   %s   \n  - Sky Conditions:\n   %s   \n  - Temperature:\n   %s Deg F  \n  - Wind Speed:\n   %s Knots  \n  - Wind Direction:\n   %s Deg  \n"%(weatherScenario,skyConditions,temperature,windSpeed,windDirection))
 
 		
-#	def Update(self):
-		#self.GetParent().SendSizeEvent()
-	#	self.FlightInfoPanel.Update()
 
 class PlaneSelectPanel(wx.Panel):
 	def __init__(self,parent,id):
@@ -120,10 +104,6 @@ class PlaneSelectPanel(wx.Panel):
 
 
 
-	#def add(self,event):
-		#self.vbox.Add((wx.RadioButton(self.panel,-1,"Button")))
-		#self.panel.Layout()
-		#self.addRadio("wahoo")
 		
 	def addRadio(self,name):
 		found = 0
@@ -142,15 +122,12 @@ class PlaneSelectPanel(wx.Panel):
 			else:
 				radioButton.SetValue(0)
 		self.Layout()
-		#self.GetParent().SendSizeEvent()
 	
 	def OnGroup1Select( self, event ):
 		global currentDisplayFlight
 		radio_selected = event.GetEventObject()
 		print('Group1 %s selected\n' % radio_selected.GetLabel() )
 		currentDisplayFlight = radio_selected.GetLabel()
-		#self.FlightInfoClass.updateText(radio_selected.GetLabel(),
-		#self.parent.EnvironmentInfo
 		
 
 	def updateFlightInfoObject(self,object):
@@ -168,27 +145,16 @@ class GPSPanel(wx.Panel):
 		self.parent.html_view.LoadURL(dir_name)
 		GPSSizer.Add(self.parent.html_view,1,wx.EXPAND)
 		self.SetSizer(GPSSizer)
-		#scriptString = """addMarker(new google.maps.LatLng(%s,%s))""" % (str(10.1),str(20.1))
-		#parent.html_view.RunScript(scriptString)
-		#self.HTML_VIEW = parent.html_view
 		
 	def UpdateMarker(self,name,FGObjects):
 		fgobject = FGObjects[name]
-		#print("updating the marker")
 	
 	def CreateMarker(self,name,FGObjects):
 		fgobject = FGObjects[name]
 		coordinateLat = fgobject.prop_list['latitude-deg']
 		coordinateLong = fgobject.prop_list['longitude-deg']
-		#print("coordinateLat %s"%coordinateLat)
-		#print("coordinateLong %s"%coordinateLong)
 		scriptString = """addMarker(new google.maps.LatLng(%s,%s))""" % (str(20.0),str(30.0))
-		#print(scriptString)
-		#self.parent.html_view.RunScript(scriptString)
-		#self.parent.CallJavaScriptFunction(scriptString)
-		#return scriptString
 
-		#print("creating the marker")
 
 class FlightPanel(wx.Panel):
 	def __init__(self,parent,id):
@@ -200,15 +166,12 @@ class FlightPanel(wx.Panel):
 
 		self.FlightInfoPanel.SetBackgroundColour("white")
 		
-		#self.FlightInfoPanel = FlightPanel(self,-1)
 		
 		sizer = wx.BoxSizer(wx.VERTICAL)
 		sizer2 = wx.BoxSizer(wx.VERTICAL)
 		sizer3 = wx.BoxSizer(wx.VERTICAL)
-		#textSizer = wx.BoxSizer()
 		
 		self.boldFont = wx.Font(14,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
-		#sizer = wx.BoxSizer()
 		
 		sizer2.Add(sizer3,1,wx.EXPAND)
 		self.FlightInfoPanel.SetSizer(sizer2)
@@ -219,33 +182,18 @@ class FlightPanel(wx.Panel):
 		self.FlightInfoPanel.Layout()
 		
 		self.Centre()
-		self.FlightInfoText = wx.StaticText(self.FlightInfoPanel, label = "\n  Flight Info\n\n  - Flight Name:  \n  - Latitude:     - Longitude:     \n - Speed:   \n  - Orientation:  \n  - Altitude:   \n  - Fuel:  \n  - Flight Time:  \n   - Current Time:")
+		self.FlightInfoText = wx.StaticText(self.FlightInfoPanel, label = "\n  Flight Info\n\n  - Flight Name:  \n  - Latitude:     - Longitude:     \n - Speed:   \n  - Heading:  \n  - Altitude:   \n  - Current Fuel:  \n  - Total Fuel Capacity:  \n  - Flight Time:  \n   - Current Time:")
 		self.FlightInfoText.SetFont(self.boldFont)
 		
 		sizer3.Add(self.FlightInfoText)
 		
-		# sizer.Add(self.FlightInfoPanel,1,wx.EXPAND)
-		# #sizer.Layout()
-		# #sizer.FitInside()
-		# #sizer.Add(textSizer,1,wx.EXPAND)
-		
-		# self.SetSizer(sizer)
-		# #sizer.Fit(self)
-		# self.FlightInfoPanel.FitInside()
-		# self.FlightInfoPanel.SetupScrolling()
 		self.FlightInfoPanel.SetAutoLayout(1)
-		#self.FlightInfoPanel.Layout()
-
-		
-#	def Update(self):
-		#self.GetParent().SendSizeEvent()
-	#	self.FlightInfoPanel.Update()
-		
-	def updateText(self,name,lat,lon,elapsedTime):
+	
+	def updateText(self,name,lat,lon,speed,heading,alt,currentFuel,fuelCapacity,elapsedTime):
 		#print("update the text")
 
 		currentTime = datetime.now()
-		self.FlightInfoText.SetLabel("\n  Flight Info\n\n  - Flight Name:  %s  \n  - Latitude:  %s  - Longitude:  %s   \n  - Speed:   \n  - Orientation: \n  - Altitude:   \n  - Fuel:  \n  - Flight Time:  %s\n  - Current Time:  %s"%(name,lat,lon,elapsedTime,currentTime))
+		self.FlightInfoText.SetLabel("\n  Flight Info\n\n  - Flight Name:  %s  \n  - Latitude:  %s  - Longitude:  %s   \n  - Speed:  %s \n  - Heading:  %s \n  - Altitude:  %s \n  - Current Fuel:  %s \n  - Total Fuel Capacity:  %s \n  - Flight Time:  %s\n  - Current Time:  %s"%(name,lat,lon,speed,heading,alt,currentFuel,fuelCapacity,elapsedTime,currentTime))
 
 		
 
@@ -318,18 +266,31 @@ class GPSWindow(wx.Frame):
 		
 
 		for name,playerDict in self.fgObjects.iteritems():
-			#print(name)
 			lat = ""
 			lon = ""
 			speed = ""
+			alt = ""
+			heading = ""
+			currentFuel = ""
+			fuelCapacity = ""
+			localTime = ""
 			for property,value in playerDict.prop_list.iteritems():
-				#print("%s: %s"%(property,value))
 				if(property == "latitude-deg"):
 					lat = value
-					#print(lat)
-				if(property == "longitude-deg"):
+				elif(property == "longitude-deg"):
 					lon = value
-					#print(lon)
+				elif(property == "airspeed-kt"):
+					speed = value
+				elif(property == "altitude"):
+					alt = value
+				elif(property == "heading-deg"):
+					heading = value
+				elif(property == "total-fuel-gals"):
+					currentFuel = value
+				elif(property == "total-fuel-capacity"):
+					fuelCapacity = value 
+				
+				print("property: %s, value: %s"%(property,value))
 
 				
 			currentTime = datetime.now()
@@ -338,14 +299,14 @@ class GPSWindow(wx.Frame):
 			self.fgObjects[name].prop_list['pastLat'] = lat;
 			self.fgObjects[name].prop_list['pastLon'] = lon;
 			selected = self.fgObjects[name].prop_list['selected']
-			scriptString = """updateMarker(%s,%s,"%s","%s")""" % (str(lat),str(lon),str(name),selected)
+			scriptString = """updateMarker(%s,%s,"%s",%s,"%s")""" % (str(lat),str(lon),str(name),str(heading),selected)
 			self.MainPanel.html_view.RunScript(scriptString)
 			self.PlaneSelectPanel.addRadio(name)
 
 			global currentDisplayFlight
 			if(name == currentDisplayFlight):
 				self.fgObjects[name].prop_list['selected'] = "yes"
-				self.FlightInfo.updateText(name,lat,lon,self.fgObjects[name].prop_list['timeElapsed'])
+				self.FlightInfo.updateText(name,lat,lon,speed,heading,alt,currentFuel,fuelCapacity,self.fgObjects[name].prop_list['timeElapsed'])
 			else:
 				self.fgObjects[name].prop_list['selected'] = "no"
 			
@@ -367,7 +328,7 @@ class GPSWindow(wx.Frame):
 				windDirection = value
 			elif(property == "wind-speed-kt"):
 				windSpeed = value
-		print("weather scenario: %s, skyConditions: %s, temp: %s, windspeed: %s, wind direction: %s"%(weatherScenario,skyConditions,temperature,windSpeed,windDirection))
+		#print("weather scenario: %s, skyConditions: %s, temp: %s, windspeed: %s, wind direction: %s"%(weatherScenario,skyConditions,temperature,windSpeed,windDirection))
 		self.EnvironmentInfo.UpdateText(weatherScenario,skyConditions,temperature,windSpeed,windDirection)
 
 		
@@ -384,18 +345,10 @@ class GPSWindow(wx.Frame):
 					else:
 						newPlayer = FGObject(playerid, dict)
 						self.fgObjects[playerid] = newPlayer
-						#if(playerid == 'Player'):
-							#self.PlaneSelectPanel.addRadio(str(playerid))
-							#print("done")
+
 				elif "Environment" in dict:
-					#if(self.fgEnvironmentObject):
-					#	continue
-					#	#print("not empty")
-					#else:
-					#	#print("empty")
 					self.fgEnvironmentObject = dict
 
-					#print("evironment stuff")
 						
 	def distance_on_unit_sphere(self,lat1, long1, lat2, long2):
 		# Convert latitude and longitude to 
@@ -508,6 +461,7 @@ class PyMap:
 		var infowindow;
 		var image;
 		var markers = [];
+		var symbols = [];
 		var planeSymbol;
 		var planeSymbolSelected;
 		function initialize() {
@@ -650,21 +604,31 @@ class PyMap:
 
 		function addMarker(lat, lon,name) {
 			var location = new google.maps.LatLng(lat,lon);
+			symbol = {
+				path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+				scale: 4,
+				strokeWeight: 3,
+				strokeColor: 'red',
+				rotation: 0
+			};
 			var marker = new google.maps.Marker({
 				position: location,
 				map: map,
-				icon: planeSymbol,
+				icon: symbol,
 				title: name,
 				optimized: false,
 				pastLat: lat,
 				pastLon: lon,
 				animation: google.maps.Animation.DROP
-				//rotation: 180
 			});
 			markers.push(marker);
 		}
 		
-		function updateMarker(lat, lon,name,selected) {
+		function addSymbol() {
+			//var symbol = new planeSymbol;
+		}
+		
+		function updateMarker(lat, lon,name,heading,selected) {
 			var theIndex;
 			var found = 0
 			if(markers.length == 0) {
@@ -677,17 +641,35 @@ class PyMap:
 					{
 						
 						var newPosition = new google.maps.LatLng(lat,lon);
-						if((parseFloat(markers[i].getPosition().lat()) == parseFloat(lat)) && (parseFloat(markers[i].getPosition().lng()) == parseFloat(lon))) {
-						}
-						else {
+						//if((parseFloat(markers[i].getPosition().lat()) == parseFloat(lat)) && (parseFloat(markers[i].getPosition().lng()) == parseFloat(lon))) {
+						//	markers[i].icon.rotation = parseFloat(heading);
+						//}
+						//else {
 
-							markers[i].setPosition(newPosition);
 							if(selected == 'yes') {
-								markers[i].setIcon(planeSymbolSelected);
+								symbol = {
+									path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+									scale: 4,
+									strokeWeight: 3,
+									strokeColor: 'green',
+									rotation: heading
+								};
+								markers[i].setIcon(symbol);
 							}
 							else {
-								markers[i].setIcon(planeSymbol);
+								symbol = {
+									path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+									scale: 4,
+									strokeWeight: 3,
+									strokeColor: 'red',
+									rotation: heading
+								};
+								markers[i].setIcon(symbol);
 							}
+
+							markers[i].setPosition(newPosition);
+							//markers[i].setIcon(symbol);
+							
 
 							
 							var lineCoords = [new google.maps.LatLng(parseFloat(markers[i].pastLat), parseFloat(markers[i].pastLon)),new google.maps.LatLng(parseFloat(lat), parseFloat(lon))];
@@ -704,12 +686,13 @@ class PyMap:
 							markers[i].pastLon = lon;
 							
 							
-						}
+						//}
 						found = 1
 					}
 				}
 				if(found == 0) {
 					addMarker(lat,lon,name);
+					addSymbol();
 				}
 			}
 		}
