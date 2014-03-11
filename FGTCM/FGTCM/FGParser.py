@@ -10,15 +10,16 @@ and return
 
 '''
 import re
+import string
 
 def parse(string):
     
-    playerRecordsList = re.split("\n+",string)
+    RecordsList = re.split("\n+",string)
     #print("length of list is: %s"% len(playerRecordsList))
-    playerPropDictList = []
+    PropDictList = []
     
     
-    for prop in playerRecordsList:
+    for prop in RecordsList:
         print("received prop: %s"%prop)
         props = re.split(",",prop)
         
@@ -27,9 +28,24 @@ def parse(string):
             kv = re.split(" ",pair)
             if len(kv) == 2:
                 propDict[kv[0]] = kv[1]
+                #print("%s   %s"%(kv[0],kv[1]))
+            elif(len(kv) == 1 and kv[0] == "Environment"):
+                propDict[kv[0]] = 'Information'
+            elif(kv[0] == 'weather-scenario'):
+                weatherScenario = ''
+                counter = 0
+                for item in kv:
+					if(counter>0):
+						weatherScenario+=str(item)
+						weatherScenario+=' '
+					counter+=1
+                propDict[kv[0]] = weatherScenario
+                #print(weatherScenario)
+				
             else:
+                #print("%s <----BAD"%(kv[0]))
                 continue
 			
-        playerPropDictList.append(propDict)
+        PropDictList.append(propDict)
                 #print('key value 1: %s, key value 2: %s\n'% (kv[0],kv[1]))
-    return playerPropDictList
+    return PropDictList

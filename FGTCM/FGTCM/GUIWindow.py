@@ -9,6 +9,7 @@ import wx.lib.scrolledpanel as scrolled
 
 from datetime import datetime
 from FGObject import FGObject
+from FGEnvironmentObject import FGEnvironmentObject
 import FGParser
 
 #global coordinates for the plane marker
@@ -52,10 +53,10 @@ class EnvironmentPanel(wx.Panel):
 		self.FlightInfoPanel.Layout()
 		
 		self.Centre()
-		self.FlightInfoText = wx.StaticText(self.FlightInfoPanel, label = "\n\n  Environment Info\n\n  - Time of Day:\n      Noon\n  - Sky Conditions:\n      Clear Skies\n  - Temperature:\n      54 Degrees F\n  - Wind Speed:\n      8 Knots\n  - Wind Direction:\n      North East\n")
-		self.FlightInfoText.SetFont(self.boldFont)
+		self.EnvironmentInfoText = wx.StaticText(self.FlightInfoPanel, label = "\n\n  Environment Info\n\n  - Weather Scenario:\n      \n  - Sky Conditions:\n      \n  - Temperature:\n      \n  - Wind Speed:\n      \n  - Wind Direction:\n      \n")
+		self.EnvironmentInfoText.SetFont(self.boldFont)
 		
-		sizer3.Add(self.FlightInfoText)
+		sizer3.Add(self.EnvironmentInfoText)
 		
 		# sizer.Add(self.FlightInfoPanel,1,wx.EXPAND)
 		# #sizer.Layout()
@@ -68,6 +69,9 @@ class EnvironmentPanel(wx.Panel):
 		# self.FlightInfoPanel.SetupScrolling()
 		self.FlightInfoPanel.SetAutoLayout(1)
 		#self.FlightInfoPanel.Layout()
+		
+	def UpdateText(self,weatherScenario,skyConditions,temperature,windSpeed,windDirection):
+		self.EnvironmentInfoText.SetLabel("\n\n  Environment Info\n\n  - Weather Scenario:\n   %s   \n  - Sky Conditions:\n   %s   \n  - Temperature:\n   %s Deg F  \n  - Wind Speed:\n   %s Knots  \n  - Wind Direction:\n   %s Deg  \n"%(weatherScenario,skyConditions,temperature,windSpeed,windDirection))
 
 		
 #	def Update(self):
@@ -78,6 +82,7 @@ class PlaneSelectPanel(wx.Panel):
 	def __init__(self,parent,id):
 		wx.Panel.__init__(self,parent,id)
 		self.SetBackgroundColour("Black")
+		self.SetDoubleBuffered(True)
 		self.parent = parent
 		self.FlightInfoClass = ""
 		self.panel = scrolled.ScrolledPanel(self, -1)
@@ -259,7 +264,6 @@ class GPSWindow(wx.Frame):
 		self.RightVertSizer = wx.BoxSizer(wx.VERTICAL)
 		LeftVertSizer = wx.BoxSizer(wx.VERTICAL)
 		GPSSizer = wx.BoxSizer()
-		#self.html_view = wx.html2.WebView.New(self)
 		
 		#The main panel all others will be parented to
 		self.MainPanel = wx.Panel(self)
@@ -278,7 +282,7 @@ class GPSWindow(wx.Frame):
 		LeftVertSizer.Add(self.EnvironmentInfo,2,wx.EXPAND|wx.LEFT|wx.TOP|wx.BOTTOM,5)#|wx.ALL,5)
 		LeftVertSizer.Add(self.PlaneSelectPanel,1,wx.EXPAND|wx.BOTTOM|wx.LEFT,5)#|wx.ALL,5)
 		
-		#self.RightVertSizer.Layout()
+
 		
 		#add the left sub panel and right sizer to the main horizontal sizer
 		TopHorizSizer.Add(LeftVertSizer,1,wx.EXPAND)
@@ -287,10 +291,7 @@ class GPSWindow(wx.Frame):
 		#set the main panel's sizer
 		self.MainPanel.SetSizer(TopHorizSizer)
 		self.MainPanel.Fit()
-		#self.MainPanel.SetAutoLayout(1)
-		#self.SendSizeEvent()
-		
-		#self.SendSizeEvent()
+
 
 		#initiate timer and timer event
 		self.timer = wx.Timer(self)
@@ -298,14 +299,13 @@ class GPSWindow(wx.Frame):
 		
 		self.timer.Start(300)
 		self.fgObjects = {}
+		self.fgEnvironmentObject = {}
 	
 	#called on every timer event, updates the main panel
 	def OnTimer(self, event):
 		self.updateTheView()
 		
-	#def OnSize(self,event):
-		#self.RightVertSizer.Layout()
-		#self.Layout()
+
 
 	#updates main panel which will update all sub panels
 	def updateTheView(self):
@@ -315,11 +315,8 @@ class GPSWindow(wx.Frame):
 		#self.GPS.Update(self.fgObjects)
 		self.EnvironmentInfo.Update()
 		self.FlightInfo.Update()
-		#scriptString = """moveMarker(new google.maps.LatLng(%s,%s),map,marker)""" % (str(coordinate1),str(coordinate2))
-		#self.MainPanel.html_view.RunScript(scriptString)
 		
-		#scriptString = """deleteMarkers()"""
-		#self.MainPanel.html_view.RunScript(scriptString)
+
 		for name,playerDict in self.fgObjects.iteritems():
 			#print(name)
 			lat = ""
@@ -338,13 +335,8 @@ class GPSWindow(wx.Frame):
 			currentTime = datetime.now()
 			elapsedTime = currentTime - self.fgObjects[name].prop_list['startTime']
 			self.fgObjects[name].prop_list['timeElapsed'] = elapsedTime
-			#if((self.fgObjects[name].prop_list['pastLat'] != 'none') and (self.fgObjects[name].prop_list['pastLon'] != 'none')):
-				#arc = self.distance_on_unit_sphere(float(lat),float(lon),float(self.fgObjects[name].prop_list['pastLat']),float(self.fgObjects[name].prop_list['pastLon']))
-				#miles = 3963.1676 * arc
-				#print("arc is: %s, miles are: %s,past lat/long: %s,%s  , current lat/lon %s,%s"%(arc,miles,float(self.fgObjects[name].prop_list['pastLat']),float(self.fgObjects[name].prop_list['pastLon']),lat,lon))
 			self.fgObjects[name].prop_list['pastLat'] = lat;
 			self.fgObjects[name].prop_list['pastLon'] = lon;
-			#print(self.fgObjects[name].prop_list['pastLat']+"   "+self.fgObjects[name].prop_list['pastLon'])
 			selected = self.fgObjects[name].prop_list['selected']
 			scriptString = """updateMarker(%s,%s,"%s","%s")""" % (str(lat),str(lon),str(name),selected)
 			self.MainPanel.html_view.RunScript(scriptString)
@@ -352,10 +344,8 @@ class GPSWindow(wx.Frame):
 
 			global currentDisplayFlight
 			if(name == currentDisplayFlight):
-				#print("matched" + name)
 				self.fgObjects[name].prop_list['selected'] = "yes"
 				self.FlightInfo.updateText(name,lat,lon,self.fgObjects[name].prop_list['timeElapsed'])
-				#self.PlaneSelectPanel.addRadio(name)
 			else:
 				self.fgObjects[name].prop_list['selected'] = "no"
 			
@@ -363,32 +353,49 @@ class GPSWindow(wx.Frame):
 		coordinate1 +=1
 		coordinate2 +=2
 		
-		#scriptString = """updateMarkers(new google.maps.LatLng(%s,%s))"""%(str(coordinate1),str(coordinate2))
-		#self.MainPanel.html_view.RunScript(scriptString)
-		
-	#def callJavaScriptFunction(stringCommand):
-		#self.MainPanel.html_view.RunScript(stringCommand)
-		#print("call this function")
+		weatherScenario = ""
+		skyConditions = ""
+		temperature = ""
+		windSpeed = ""
+		windDirection = ""
+		for property,value in self.fgEnvironmentObject.iteritems():
+			if(property == "weather-scenario"):
+				weatherScenario = value
+			elif(property == "temperature-degf"):
+				temperature = value
+			elif(property == "wind-from-heading-deg"):
+				windDirection = value
+			elif(property == "wind-speed-kt"):
+				windSpeed = value
+		print("weather scenario: %s, skyConditions: %s, temp: %s, windspeed: %s, wind direction: %s"%(weatherScenario,skyConditions,temperature,windSpeed,windDirection))
+		self.EnvironmentInfo.UpdateText(weatherScenario,skyConditions,temperature,windSpeed,windDirection)
 
 		
 	def updateFGObjs(self, string):
 		if string is not None:
-			fgPlayerDictsList = FGParser.parse(string)
-			if len(fgPlayerDictsList) == 0:
+			fgDictsList = FGParser.parse(string)
+			if len(fgDictsList) == 0:
 				return
-			for playerDict in fgPlayerDictsList:
-				if "playername" not in playerDict:
-					continue
-				else:
-					playerid = playerDict["playername"]
+			for dict in fgDictsList:
+				if "playername" in dict:
+					playerid = dict["playername"]
 					if playerid in self.fgObjects:
-						self.fgObjects[playerid].updateFromMessage(playerDict)
+						self.fgObjects[playerid].updateFromMessage(dict)
 					else:
-						newPlayer = FGObject(playerid, playerDict)
+						newPlayer = FGObject(playerid, dict)
 						self.fgObjects[playerid] = newPlayer
 						#if(playerid == 'Player'):
 							#self.PlaneSelectPanel.addRadio(str(playerid))
 							#print("done")
+				elif "Environment" in dict:
+					#if(self.fgEnvironmentObject):
+					#	continue
+					#	#print("not empty")
+					#else:
+					#	#print("empty")
+					self.fgEnvironmentObject = dict
+
+					#print("evironment stuff")
 						
 	def distance_on_unit_sphere(self,lat1, long1, lat2, long2):
 		# Convert latitude and longitude to 
