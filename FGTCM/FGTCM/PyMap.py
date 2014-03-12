@@ -16,6 +16,49 @@ class PyMap:
 		var symbols = [];
 		var planeSymbol;
 		var planeSymbolSelected;
+		var chicago = new google.maps.LatLng(41.850033, -87.6500523);
+		
+		function HomeControl(controlDiv, map) {
+
+		// Set CSS styles for the DIV containing the control
+		// Setting padding to 5 px will offset the control
+		// from the edge of the map
+		
+		controlDiv.style.padding = '6px';
+
+		// Set CSS for the control border
+		var controlUI = document.createElement('div');
+		controlUI.style.backgroundColor = 'white';
+		controlUI.style.borderStyle = 'solid';
+		controlUI.style.borderWidth = '1px';
+		controlUI.style.cursor = 'pointer';
+		controlUI.style.textAlign = 'center';
+		controlUI.title = 'Click to set the map to Home';
+		controlDiv.appendChild(controlUI);
+
+		// Set CSS for the control interior
+		var controlText = document.createElement('div');
+		controlText.style.fontFamily = 'Arial,sans-serif';
+		controlText.style.fontSize = '12px';
+		controlText.style.paddingLeft = '4px';
+		controlText.style.paddingRight = '4px';
+		controlText.innerHTML = '<b>Center On Selected</b>';
+		controlUI.appendChild(controlText);
+
+		// Setup the click event listeners: simply set the map to
+		// Chicago
+		google.maps.event.addDomListener(controlUI, 'click', function() {
+			for (var i = 0; i < markers.length; i++) {
+				if(markers[i].selected == true)
+				{
+					map.setCenter(markers[i].getPosition());
+				}
+			}
+		});
+
+		}
+		
+		
 		function initialize() {
 			center = new google.maps.LatLng(37.6069,-122.381);
 			var mapOptions = {zoom: 8,center: center};//,mapTypeId: google.maps.MapTypeId.TERRAIN};
@@ -42,86 +85,20 @@ class PyMap:
 				strokeColor: 'green'
 			}
 			map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
-			//marker = new google.maps.Marker({position: center, map: map,icon: image, animation: google.maps.Animation.DROP});
-			var polyOptions = {
-			strokeColor: '#FF00FF',
-			strokeOpacity: 1.0,
-			strokeWeight: 3
-			};
-			poly = new google.maps.Polyline(polyOptions);
-			poly.setMap(map);
 			
-			//var contentString = ['coordinates','Latitude: ' + marker.getPosition().lat(), 'Longitude: '+marker.getPosition().lng()].join('<br>');
-			
-			//function createInfoWindowContent(){
-			//	return[
-			//		'Coordinates:',
-			//		'Latitude: ' + marker.getPosition().lat(),
-			//		'Longitude: ' + marker.getPosition().lng()
-			//	].join('<br>');
-			//}
-			//infowindow = new google.maps.InfoWindow();
-			
-			//google.maps.event.addListener(marker, 'click', function() {
-			//	infowindow.setContent(createInfoWindowContent());
-			//	infowindow.open(map,marker);
-			//});
-			
-			//google.maps.event.addListener(map,'click',function(event) {
-			//	addMarker(event.latLng,'click');
-			//});
-			
-			
-			//--------------------------------------------------------------------------------
-			
+			// Create the DIV to hold the control and
+			// call the HomeControl() constructor passing
+			// in this DIV.
+			var homeControlDiv = document.createElement('div');
+			var homeControl = new HomeControl(homeControlDiv, map);
 
-
-			  var lineCoordinates = [
-				new google.maps.LatLng(22.291, 153.027),
-				new google.maps.LatLng(18.291, 153.027)
-			  ];
-
-			  // Define the symbol, using one of the predefined paths ('CIRCLE')
-			  // supplied by the Google Maps JavaScript API.
-			  var lineSymbol = {
-				path: google.maps.SymbolPath.CIRCLE,
-				scale: 8,
-				strokeColor: '#393',
-				stokeOpacity: 1
-			  };
-
-			  // Create the polyline and add the symbol to it via the 'icons' property.
-			//  line = new google.maps.Polyline({
-				//path: lineCoordinates,
-				//strokeWeight: 0,
-			//	icons: [{
-			//	  icon: lineSymbol,
-			//	  offset: '100%'
-			//	}],
-			//	map: map
-			//  });
-
-			  //animateCircle();
-			
-			
-			//--------------------------------------------------------------------------------
+			homeControlDiv.index = 1;
+			map.controls[google.maps.ControlPosition.TOP_RIGHT].push(homeControlDiv);
 			
 
 
 		}
 		
-		
-		function animateCircle() {
-		    var count = 0;
-			window.setInterval(function() {
-			  count = (count + 1) % 15;
-
-			  var icons = line.get('icons');
-			  icons[0].offset = (count / .15) + '%';
-			  //icons[0].offset = '50%';
-			  line.set('icons', icons);
-		  }, 20);
-		}
 		
 		// Sets the map on all markers in the array.
 		function setAllMap(map) {
@@ -171,14 +148,12 @@ class PyMap:
 				optimized: false,
 				pastLat: lat,
 				pastLon: lon,
-				animation: google.maps.Animation.DROP
+				animation: google.maps.Animation.DROP,
+				selected: false
 			});
 			markers.push(marker);
 		}
 		
-		function addSymbol() {
-			//var symbol = new planeSymbol;
-		}
 		
 		function updateMarker(lat, lon,name,heading,selected) {
 			var theIndex;
@@ -207,6 +182,7 @@ class PyMap:
 									rotation: heading
 								};
 								markers[i].setIcon(symbol);
+								markers[i].selected = true;
 							}
 							else {
 								symbol = {
@@ -217,6 +193,7 @@ class PyMap:
 									rotation: heading
 								};
 								markers[i].setIcon(symbol);
+								markers[i].selected = false;
 							}
 
 							markers[i].setPosition(newPosition);
@@ -244,7 +221,6 @@ class PyMap:
 				}
 				if(found == 0) {
 					addMarker(lat,lon,name);
-					addSymbol();
 				}
 			}
 		}

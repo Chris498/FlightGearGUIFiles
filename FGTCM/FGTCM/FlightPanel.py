@@ -16,7 +16,7 @@ class FlightPanel(wx.Panel):
 		sizer = wx.BoxSizer(wx.VERTICAL)
 		sizer2 = wx.BoxSizer(wx.VERTICAL)
 		sizer3 = wx.BoxSizer(wx.VERTICAL)
-		
+		a = 1
 		self.boldFont = wx.Font(14,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
 		
 		sizer2.Add(sizer3,1,wx.EXPAND)

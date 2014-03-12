@@ -17,16 +17,34 @@ from GPSPanel import GPSPanel
 from FlightPanel import FlightPanel
 from MyListener import MyListener
 from PyMap import PyMap
+from Log import Log
 
 
 
-		
+EXIT = wx.NewId()
+LOG = wx.NewId()
+
 class FlightSimulatorSuite(wx.Frame):
 	def __init__(self, parent, id,):  
 		
 		
 		super(FlightSimulatorSuite, self).__init__(parent, size=(1024,700), style = wx.DEFAULT_FRAME_STYLE)#^wx.RESIZE_BORDER)
 		self.currentDisplayFlight = "Player"
+		
+		menubar = wx.MenuBar()
+		fileMenu = wx.Menu()
+		optionsMenu = wx.Menu()
+		
+		fileMenu.Append(EXIT, 'Exit', 'Exit')
+		optionsMenu.Append(LOG, 'Log', 'Log')
+		
+		menubar.Append(fileMenu,'File')
+		menubar.Append(optionsMenu,'Options')
+		
+		self.SetMenuBar(menubar)
+		
+		self.Bind(wx.EVT_MENU, self.ExitProgram, id=EXIT)
+		self.Bind(wx.EVT_MENU, self.Log, id=LOG)
 		
 		#The top most sizer that splits the screen horizontally
 		TopHorizSizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -169,6 +187,12 @@ class FlightSimulatorSuite(wx.Frame):
 				elif "Environment" in dict:
 					self.fgEnvironmentObject = dict
 	
+	
+	def Log(self,e):
+		log = Log(parent = frame, id = -1)
+		log.Show()
+	def ExitProgram(self,e):
+		self.Destroy()
 
 		
 if __name__ == '__main__':
