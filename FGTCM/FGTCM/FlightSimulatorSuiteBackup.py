@@ -62,7 +62,7 @@ class FlightSimulatorSuite(wx.Frame):
 		self.FlightInfo = FlightPanel(self.MainPanel,-1)
 		self.GPS = GPSPanel(self.MainPanel,-1)
 		self.PlaneSelectPanel = PlaneSelectPanel(self.MainPanel,-1)
-		self.PlaneSelectPanel.updateFlightInfoObject(self.FlightInfo)
+		self.PlaneSelectPanel.updateFlightInfoObject(self.FlightInfo.FlightInfoPanel)
 
 		#add sub panels to the right sizer
 		self.RightVertSizer.Add(self.GPS,2,wx.EXPAND|wx.ALL,5)
