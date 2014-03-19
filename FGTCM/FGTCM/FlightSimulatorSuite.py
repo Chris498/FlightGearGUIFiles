@@ -132,7 +132,7 @@ class FlightSimulatorSuite(wx.Frame):
 				elif(property == "total-fuel-capacity"):
 					fuelCapacity = value 
 				
-				print("property: %s, value: %s"%(property,value))
+				#print("property: %s, value: %s"%(property,value))
 
 				
 			currentTime = datetime.now()
