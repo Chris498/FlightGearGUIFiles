@@ -2,11 +2,10 @@ import wx
 import wx.lib.scrolledpanel as scrolled
 
 class Log(wx.Frame):
-	def __init__(self, parent, id):
+	def __init__(self, parent, player, logObject, id):
 		wx.Frame.__init__(self,parent,id,'',size = (300,400), style = wx.DEFAULT_FRAME_STYLE)
 		self.SetTitle("Log")
 		self.Bind(wx.EVT_CLOSE,self.closewindow)
-		
 		
 		self.SetDoubleBuffered(True)
 		
@@ -20,7 +19,7 @@ class Log(wx.Frame):
 		sizer2 = wx.BoxSizer(wx.VERTICAL)
 		sizer3 = wx.BoxSizer(wx.VERTICAL)
 		a = 1
-		self.boldFont = wx.Font(14,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
+		self.boldFont = wx.Font(10,wx.FONTFAMILY_MODERN,wx.FONTSTYLE_ITALIC,wx.FONTWEIGHT_BOLD)
 		
 		sizer2.Add(sizer3,1,wx.EXPAND)
 		self.LogPanel.SetSizer(sizer2)
@@ -31,7 +30,20 @@ class Log(wx.Frame):
 		self.LogPanel.Layout()
 		
 		self.Centre()
-		self.FlightInfoText = wx.StaticText(self.LogPanel, label = "\n  LOG\n  - ENTRY 1: \n  - ENTRY 2: \n  - ENTRY 3: \n  - ENTRY 4: \n  - ENTRY 5: \n  - ENTRY 6: \n  - ENTRY 7: \n  - ENTRY 8: \n  - ENTRY 9: ")
+		
+		textToDisplay = ("\n  FLIGHT LOG \n\n Flight Name:  %s \n Flight Started at:  %s \n"%(logObject.prop_list['name'],logObject.prop_list['startTime']))
+		
+		numPositions = len(logObject.prop_list['lat'])
+		for x in range(0,numPositions):
+			textToDisplay += (" ENTRY %s: Latitude: %s, Longitude: %s \n"% (x+1,logObject.prop_list['lat'][x],logObject.prop_list['lon'][x]))
+			#print(logObject.prop_list['lat'][x])
+			#print(logObject.prop_list['lon'][x])
+		#print numPositions
+		if 'endtime' in logObject.prop_list:
+			textToDisplay += (" Flight ended at: %s"%logObject.prop_list['endtime'])
+		
+		
+		self.FlightInfoText = wx.StaticText(self.LogPanel, label = textToDisplay )
 		self.FlightInfoText.SetFont(self.boldFont)
 		
 		sizer3.Add(self.FlightInfoText)

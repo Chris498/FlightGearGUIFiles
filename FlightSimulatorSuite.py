@@ -18,6 +18,7 @@ from FlightPanel import FlightPanel
 from MyListener import MyListener
 from PyMap import PyMap
 from Log import Log
+from FGLog import FGLog
 
 
 
@@ -31,20 +32,19 @@ class FlightSimulatorSuite(wx.Frame):
 		super(FlightSimulatorSuite, self).__init__(parent, size=(1024,700), style = wx.DEFAULT_FRAME_STYLE)#^wx.RESIZE_BORDER)
 		self.currentDisplayFlight = "Player"
 		
-		menubar = wx.MenuBar()
-		fileMenu = wx.Menu()
-		optionsMenu = wx.Menu()
+		self.menubar = wx.MenuBar()
+		self.fileMenu = wx.Menu()
+		self.optionsMenu = wx.Menu()
 		
-		fileMenu.Append(EXIT, 'Exit', 'Exit')
-		optionsMenu.Append(LOG, 'Log', 'Log')
+		self.fileMenu.Append(EXIT, 'Exit', 'Exit')
 		
-		menubar.Append(fileMenu,'File')
-		menubar.Append(optionsMenu,'Options')
+		self.menubar.Append(self.fileMenu,'File')
+		self.menubar.Append(self.optionsMenu,'Logs')
 		
-		self.SetMenuBar(menubar)
+		self.SetMenuBar(self.menubar)
 		
 		self.Bind(wx.EVT_MENU, self.ExitProgram, id=EXIT)
-		self.Bind(wx.EVT_MENU, self.Log, id=LOG)
+		#self.Bind(wx.EVT_MENU, self.Log, id=LOG)
 		
 		#The top most sizer that splits the screen horizontally
 		TopHorizSizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -91,14 +91,37 @@ class FlightSimulatorSuite(wx.Frame):
 		self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
 		
 		self.timer.Start(300)
+		
 		self.fgObjects = {}
 		self.fgEnvironmentObject = {}
+		self.fgLogObjects = {}
 	
 	#called on every timer event, updates the main panel
 	def OnTimer(self, event):
+		self.updateLogs()
 		self.updateTheView()
 		
-
+	def updateLogs(self):
+		for name,playerDict in self.fgObjects.items():
+			if(name in self.fgLogObjects):
+				#update
+				#print("update: %s log"% name)
+				self.fgLogObjects[name].updateLog(self.fgObjects[name].prop_list)
+			else:
+				#add
+				#print("add to logs: %s" % name)
+				newLog = FGLog(name, self.fgObjects[name].prop_list)
+				self.fgLogObjects[name] = newLog
+				
+				#add new menubar item
+				newID = wx.NewId()
+				
+				
+				item = wx.MenuItem(self.optionsMenu, newID, name)
+				self.optionsMenu.AppendItem(item)
+				
+				
+				self.Bind(wx.EVT_MENU, self.Log, id=newID)
 
 	#updates main panel which will update all sub panels
 	def updateTheView(self):
@@ -208,7 +231,11 @@ class FlightSimulatorSuite(wx.Frame):
 	
 	
 	def Log(self,e):
-		log = Log(parent = frame, id = -1)
+		item = self.GetMenuBar().FindItemById(e.GetId())
+		name = item.GetText()
+		#name = e.GetEventObject().GetName()
+		#print("selected menu item: %s"%name)
+		log = Log(parent = frame,player = name,logObject =self.fgLogObjects[name], id = -1)
 		log.Show()
 	def ExitProgram(self,e):
 		self.Destroy()
