@@ -1,18 +1,10 @@
+import wx
 
-		<!DOCTYPE html>
-<html>
-  <head>
-    <title>Accessing arguments in UI events</title>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-    <meta charset="utf-8">
-    <style>
-      html, body, #map-canvas {
-        height: 100%;
-        margin: 0px;
-        padding: 0px
-      }
-    </style>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+class PyMap:
+    def GoogleMapPy(self):
+		""" Returns complete javacript for rendering map """
+        
+		self.js = """<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 		<script>
 		var map;
 		//var marker;
@@ -162,6 +154,15 @@
 			markers.push(marker);
 		}
 		
+		function removeMarker(name) {
+				for (var i = 0; i < markers.length; i++) {
+					if(markers[i].title == name) {
+						markers[i].setMap(null);
+						markers.splice(i,1);
+					}
+			}
+		}
+		
 		
 		function updateMarker(lat, lon,name,heading,selected) {
 			var theIndex;
@@ -248,10 +249,31 @@
 		google.maps.event.addDomListener(window, 'load', initialize);
 
 		</script>
-		
+		"""
+		return self.js 
+        
+    def showhtml(self):
+		"""returns a complete html page with a map"""
+        
+		self.html = """
+		<!DOCTYPE html>
+<html>
+  <head>
+    <title>Accessing arguments in UI events</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body, #map-canvas {
+        height: 100%%;
+        margin: 0px;
+        padding: 0px
+      }
+    </style>
+    %s
   </head>
   <body>
     <div id="map-canvas"></div>
   </body>
 </html>
-		
+		""" % self.GoogleMapPy()
+		return self.html

@@ -103,53 +103,67 @@ class FlightSimulatorSuite(wx.Frame):
 	#updates main panel which will update all sub panels
 	def updateTheView(self):
 		
-		self.EnvironmentInfo.Update()
-		self.FlightInfo.Update()
+		#self.EnvironmentInfo.Update()
+		#self.FlightInfo.Update()
 		
 
-		for name,playerDict in self.fgObjects.iteritems():
-			lat = ""
-			lon = ""
-			speed = ""
-			alt = ""
-			heading = ""
-			currentFuel = ""
-			fuelCapacity = ""
-			localTime = ""
-			for property,value in playerDict.prop_list.iteritems():
-				if(property == "latitude-deg"):
-					lat = value
-				elif(property == "longitude-deg"):
-					lon = value
-				elif(property == "airspeed-kt"):
-					speed = value
-				elif(property == "altitude"):
-					alt = value
-				elif(property == "heading-deg"):
-					heading = value
-				elif(property == "total-fuel-gals"):
-					currentFuel = value
-				elif(property == "total-fuel-capacity"):
-					fuelCapacity = value 
+		for name,playerDict in self.fgObjects.items():
+			if(self.fgObjects[name].prop_list['updated'] == False):
+				#Remove marker from map
+				scriptString = """removeMarker("%s")""" %(str(name))
+				self.MainPanel.html_view.RunScript(scriptString)
+				print("remove: %s"%name)
 				
-				#print("property: %s, value: %s"%(property,value))
-
+				#Remove player from fgObjects
+				del self.fgObjects[name]
 				
-			currentTime = datetime.now()
-			elapsedTime = currentTime - self.fgObjects[name].prop_list['startTime']
-			self.fgObjects[name].prop_list['timeElapsed'] = elapsedTime
-			self.fgObjects[name].prop_list['pastLat'] = lat;
-			self.fgObjects[name].prop_list['pastLon'] = lon;
-			selected = self.fgObjects[name].prop_list['selected']
-			scriptString = """updateMarker(%s,%s,"%s",%s,"%s")""" % (str(lat),str(lon),str(name),str(heading),selected)
-			self.MainPanel.html_view.RunScript(scriptString)
-			self.PlaneSelectPanel.addRadio(name)
-
-			if(name == self.currentDisplayFlight):
-				self.fgObjects[name].prop_list['selected'] = "yes"
-				self.FlightInfo.updateText(name,lat,lon,speed,heading,alt,currentFuel,fuelCapacity,self.fgObjects[name].prop_list['timeElapsed'])
+				self.PlaneSelectPanel.deleteRadio(name)
+				
+				#remove radio
+				#remove from self.fgObjects
 			else:
-				self.fgObjects[name].prop_list['selected'] = "no"
+				lat = ""
+				lon = ""
+				speed = ""
+				alt = ""
+				heading = ""
+				currentFuel = ""
+				fuelCapacity = ""
+				localTime = ""
+				for property,value in playerDict.prop_list.iteritems():
+					if(property == "latitude-deg"):
+						lat = value
+					elif(property == "longitude-deg"):
+						lon = value
+					elif(property == "airspeed-kt"):
+						speed = value
+					elif(property == "altitude"):
+						alt = value
+					elif(property == "heading-deg"):
+						heading = value
+					elif(property == "total-fuel-gals"):
+						currentFuel = value
+					elif(property == "total-fuel-capacity"):
+						fuelCapacity = value 
+					
+					#print("property: %s, value: %s"%(property,value))
+
+					
+				currentTime = datetime.now()
+				elapsedTime = currentTime - self.fgObjects[name].prop_list['startTime']
+				self.fgObjects[name].prop_list['timeElapsed'] = elapsedTime
+				self.fgObjects[name].prop_list['pastLat'] = lat;
+				self.fgObjects[name].prop_list['pastLon'] = lon;
+				selected = self.fgObjects[name].prop_list['selected']
+				scriptString = """updateMarker(%s,%s,"%s",%s,"%s")""" % (str(lat),str(lon),str(name),str(heading),selected)
+				self.MainPanel.html_view.RunScript(scriptString)
+				self.PlaneSelectPanel.addRadio(name)
+
+				if(name == self.currentDisplayFlight):
+					self.fgObjects[name].prop_list['selected'] = "yes"
+					self.FlightInfo.updateText(name,lat,lon,speed,heading,alt,currentFuel,fuelCapacity,self.fgObjects[name].prop_list['timeElapsed'])
+				else:
+					self.fgObjects[name].prop_list['selected'] = "no"
 			
 			
 		
@@ -175,6 +189,9 @@ class FlightSimulatorSuite(wx.Frame):
 			fgDictsList = FGParser.parse(string)
 			if len(fgDictsList) == 0:
 				return
+			for player,dict in self.fgObjects.iteritems():
+				self.fgObjects[player].prop_list['updated'] = False;
+				
 			for dict in fgDictsList:
 				if "playername" in dict:
 					playerid = dict["playername"]
@@ -186,6 +203,8 @@ class FlightSimulatorSuite(wx.Frame):
 
 				elif "Environment" in dict:
 					self.fgEnvironmentObject = dict
+					
+
 	
 	
 	def Log(self,e):

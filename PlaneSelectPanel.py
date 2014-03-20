@@ -68,6 +68,29 @@ class PlaneSelectPanel(wx.Panel):
 		print('Group1 %s selected\n' % radio_selected.GetLabel() )
 		self.parent.GetParent().currentDisplayFlight = radio_selected.GetLabel()
 		
+	def deleteRadio(self,name):
+		if name in self.group1_ctrls: self.group1_ctrls.remove(name)
+		buttons = self.vbox.GetChildren()
+		
+		for button in buttons:
+			widget  = button.GetWindow()
+			#print(widget.GetLabel())
+			if (widget.GetLabel() == name):
+				self.vbox.Remove(widget)
+				widget.Destroy()
+				
+		remainingButtons = self.vbox.GetChildren()
+		
+		if(self.parent.GetParent().currentDisplayFlight == name):
+			for button in remainingButtons:
+				widget  = button.GetWindow()
+				if(widget.GetName() == 'radioButton'):
+					widget.SetValue(1)
+					self.parent.GetParent().currentDisplayFlight = widget.GetLabel()
+					break
+
+				
+		
 
 	def updateFlightInfoObject(self,object):
 		self.FlightInfoClass = object

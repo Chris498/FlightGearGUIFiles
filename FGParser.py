@@ -20,7 +20,7 @@ def parse(string):
     
     
     for prop in RecordsList:
-        print("received prop: %s"%prop)
+        #print("received prop: %s"%prop)
         props = re.split(",",prop)
         
         propDict = {}
