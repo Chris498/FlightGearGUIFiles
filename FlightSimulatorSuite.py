@@ -19,11 +19,13 @@ from MyListener import MyListener
 from PyMap import PyMap
 from Log import Log
 from FGLog import FGLog
+from ConnectionDialog import ConnectionDialog
 
 
 
 EXIT = wx.NewId()
 LOG = wx.NewId()
+CONNECTION = wx.NewId()
 
 class FlightSimulatorSuite(wx.Frame):
 	def __init__(self, parent, id,):  
@@ -35,15 +37,20 @@ class FlightSimulatorSuite(wx.Frame):
 		self.menubar = wx.MenuBar()
 		self.fileMenu = wx.Menu()
 		self.optionsMenu = wx.Menu()
+		self.connectionMenu = wx.Menu()
+		
 		
 		self.fileMenu.Append(EXIT, 'Exit', 'Exit')
+		self.connectionMenu.Append(CONNECTION,'Edit Connection','Edit Connection')
 		
 		self.menubar.Append(self.fileMenu,'File')
 		self.menubar.Append(self.optionsMenu,'Logs')
+		self.menubar.Append(self.connectionMenu,'Connection')
 		
 		self.SetMenuBar(self.menubar)
 		
 		self.Bind(wx.EVT_MENU, self.ExitProgram, id=EXIT)
+		self.Bind(wx.EVT_MENU, self.EditConnection, id=CONNECTION)
 		#self.Bind(wx.EVT_MENU, self.Log, id=LOG)
 		
 		#The top most sizer that splits the screen horizontally
@@ -239,6 +246,34 @@ class FlightSimulatorSuite(wx.Frame):
 		log.Show()
 	def ExitProgram(self,e):
 		self.Destroy()
+	def EditConnection(self,e):
+		dlg = ConnectionDialog(self,-1, "Edit Connection", size=(300,300),style = wx.DEFAULT_DIALOG_STYLE,)
+		dlg.CenterOnScreen()
+		
+		val = dlg.ShowModal()
+		
+		if val == wx.ID_OK:
+			#print(dlg.text.GetValue())
+			try:
+				float(dlg.text.GetValue())
+				print(dlg.text.GetValue())
+				user = os.getenv("ACTIVEMQ_USER") or "admin"
+				password = os.getenv("ACTIVEMQ_PASSWORD") or "password"
+				host = os.getenv("ACTIVEMQ_HOST") or "localhost"
+				port = os.getenv("ACTIVEMQ_PORT") or 61613
+				conn = stomp.Connection(host_and_ports = [(host, port)])
+				conn.start()
+				conn.connect(login=user,passcode=password)
+				
+				conn.send(body = dlg.text.GetValue(),destination='MESSAGE_INTERVAL')
+				conn.disconnect()
+				
+			except ValueError:
+				print("not a number")
+		else:
+			print("You pressed Cancel\n")
+
+		dlg.Destroy()
 
 		
 if __name__ == '__main__':
@@ -267,6 +302,7 @@ if __name__ == '__main__':
 	conn2.start()
 	conn2.connect(login=user,passcode=password)
 	conn2.subscribe(destination="TEST.FOO", id=1, ack='auto')
+	
 	print("Waiting for messages...")
 	#-----------------------------------------------------------------------------
 	
