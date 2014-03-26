@@ -20,7 +20,7 @@ def parse(string):
     
     
     for prop in RecordsList:
-        #print("received prop: %s"%prop)
+        print("received prop: %s"%prop)
         props = re.split(",",prop)
         
         propDict = {}
@@ -28,18 +28,20 @@ def parse(string):
             kv = re.split(" ",pair)
             if len(kv) == 2:
                 propDict[kv[0]] = kv[1]
+                #print(kv[0])
+                #print("	%s" %kv[1])
                 #print("%s   %s"%(kv[0],kv[1]))
             elif(len(kv) == 1 and kv[0] == "Environment"):
                 propDict[kv[0]] = 'Information'
-            elif(kv[0] == 'weather-scenario'):
-                weatherScenario = ''
-                counter = 0
-                for item in kv:
-					if(counter>0):
-						weatherScenario+=str(item)
-						weatherScenario+=' '
-					counter+=1
-                propDict[kv[0]] = weatherScenario
+            #elif(kv[0] == 'station-id'):
+            #    stationID = ''
+               # counter = 0
+                #for item in kv:
+					#if(counter>0):
+			#	stationID=str(item)
+					#	stationID+=' '
+					#counter+=1
+            #    propDict[kv[0]] = stationID
                 #print(weatherScenario)
 				
             else:

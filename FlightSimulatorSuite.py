@@ -197,21 +197,26 @@ class FlightSimulatorSuite(wx.Frame):
 			
 			
 		
-		weatherScenario = ""
+		stationID = ""
 		skyConditions = ""
 		temperature = ""
 		windSpeed = ""
 		windDirection = ""
+		pressure = ""
 		for property,value in self.fgEnvironmentObject.iteritems():
-			if(property == "weather-scenario"):
-				weatherScenario = value
+			if(property == "station-id"):
+				stationID = value
 			elif(property == "temperature-degf"):
 				temperature = value
 			elif(property == "wind-from-heading-deg"):
 				windDirection = value
 			elif(property == "wind-speed-kt"):
 				windSpeed = value
-		self.EnvironmentInfo.UpdateText(weatherScenario,skyConditions,temperature,windSpeed,windDirection)
+			elif(property == "pressure"):
+				pressure = value
+		#print(stationID)
+		print(pressure)
+		self.EnvironmentInfo.UpdateText(stationID,temperature,windSpeed,windDirection,pressure)
 
 		
 	def updateFGObjs(self, string):

@@ -27,12 +27,13 @@ class EnvironmentPanel(wx.Panel):
 		self.FlightInfoPanel.Layout()
 		
 		self.Centre()
-		self.EnvironmentInfoText = wx.StaticText(self.FlightInfoPanel, label = "\n\n  Environment Info\n\n  - Weather Scenario:\n      \n  - Sky Conditions:\n      \n  - Temperature:\n      \n  - Wind Speed:\n      \n  - Wind Direction:\n      \n")
+		self.EnvironmentInfoText = wx.StaticText(self.FlightInfoPanel, label = "\n\n  Environment Info\n\n  - Station ID:\n      \n  - Temperature:\n      \n  - Wind Speed:\n      \n  - Wind Direction:\n      \n  - Air Pressure:\n      \n")
 		self.EnvironmentInfoText.SetFont(self.boldFont)
 		
 		sizer3.Add(self.EnvironmentInfoText)
 		
 		self.FlightInfoPanel.SetAutoLayout(1)
 		
-	def UpdateText(self,weatherScenario,skyConditions,temperature,windSpeed,windDirection):
-		self.EnvironmentInfoText.SetLabel("\n\n  Environment Info\n\n  - Weather Scenario:\n   %s   \n  - Sky Conditions:\n   %s   \n  - Temperature:\n   %s Deg F  \n  - Wind Speed:\n   %s Knots  \n  - Wind Direction:\n   %s Deg  \n"%(weatherScenario,skyConditions,temperature,windSpeed,windDirection))
+	def UpdateText(self,stationID,temperature,windSpeed,windDirection,pressure):
+		#print(stationID)
+		self.EnvironmentInfoText.SetLabel("\n\n  Environment Info\n\n  - Station ID:\n  %s   \n  - Temperature:\n   %s Deg F  \n  - Wind Speed:\n   %s Knots  \n  - Wind Direction:\n   %s Deg  \n  - Air Pressure:\n   %s inhg   \n"%(stationID,temperature,windSpeed,windDirection, pressure))
