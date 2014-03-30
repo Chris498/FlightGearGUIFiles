@@ -33,7 +33,7 @@ class Log(wx.Frame):
 		
 		numFlights = len(logObject.prop_list['pastFlights'])
 		
-		textToDisplay = ("\n  FLIGHT LOG \n\n ---------------------------------------------------------------------- \n CURRENT FLIGHT (Flight# %s) \n\n Flight Name:  %s \n Flight Started at:  %s \n"%((numFlights+1),logObject.prop_list['name'],logObject.prop_list['startTime']))
+		textToDisplay = ("\n  FLIGHT LOG \n\n ---------------------------------------------------------------------- \n MOST RECENT FLIGHT (Flight# %s) \n\n Flight Name:  %s \n Flight Started at:  %s \n"%((numFlights+1),logObject.prop_list['name'],logObject.prop_list['startTime']))
 		
 		numPositions = len(logObject.prop_list['lat'])
 		for x in range(0,numPositions):
