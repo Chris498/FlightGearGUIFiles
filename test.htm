@@ -24,6 +24,8 @@
 		var symbols = [];
 		var planeSymbol;
 		var planeSymbolSelected;
+		var CircleOptions;
+		var FlightZone;
 		var chicago = new google.maps.LatLng(41.850033, -87.6500523);
 		
 		function HomeControl(controlDiv, map) {
@@ -66,6 +68,48 @@
 
 		}
 		
+		function RadiusControl(controlDiv, map)  {
+				// Set CSS styles for the DIV containing the control
+		// Setting padding to 6 px will offset the control
+		// from the edge of the map
+		
+		controlDiv.style.padding = '6px';
+
+		// Set CSS for the control border
+		var controlUI = document.createElement('div');
+		controlUI.style.backgroundColor = 'white';
+		controlUI.style.borderStyle = 'solid';
+		controlUI.style.borderWidth = '1px';
+		controlUI.style.cursor = 'pointer';
+		controlUI.style.textAlign = 'center';
+		controlUI.title = 'Click to set the map to Home';
+		controlDiv.appendChild(controlUI);
+
+		// Set CSS for the control interior
+		var controlText = document.createElement('div');
+		controlText.style.fontFamily = 'Arial,sans-serif';
+		controlText.style.fontSize = '12px';
+		controlText.style.paddingLeft = '4px';
+		controlText.style.paddingRight = '4px';
+		controlText.innerHTML = '<b>Toggle Flight Zone</b>';
+		controlUI.appendChild(controlText);
+
+
+		google.maps.event.addDomListener(controlUI, 'click', function() {
+			for (var i = 0; i < markers.length; i++) {
+				if(markers[i].title == "Player")
+				{
+					if(FlightZone.getVisible() == false) {
+						FlightZone.setVisible(true);
+					}
+					else {
+						FlightZone.setVisible(false);
+					}
+				}
+			}
+		});
+		}
+		
 		
 		function initialize() {
 			center = new google.maps.LatLng(37.6069,-122.381);
@@ -102,6 +146,28 @@
 
 			homeControlDiv.index = 1;
 			map.controls[google.maps.ControlPosition.TOP_RIGHT].push(homeControlDiv);
+			
+			//Radius Control
+			var radiusControlDiv = document.createElement('div');
+			var radiusControl = new RadiusControl(radiusControlDiv, map);
+			
+			radiusControlDiv.index =1;
+			map.controls[google.maps.ControlPosition.TOP_RIGHT].push(radiusControlDiv);
+			
+			
+			CircleOptions = {
+			 strokeColor: '#FF0000',
+			 strokeOpacity: 0.8,
+			 strokeWeight: 2,
+			 fillColor: '#FF0000',
+			 fillOpacity: 0.25,
+			 map: map,
+			 center: center,
+			 radius: 185200,
+			 visible: false
+			};
+			
+			FlightZone = new google.maps.Circle(CircleOptions);
 			
 
 
@@ -183,7 +249,9 @@
 				{
 					if(markers[i].title == name)
 					{
-						
+						if(name == "Player") {
+							FlightZone.setCenter(markers[i].position);
+						}
 						var newPosition = new google.maps.LatLng(lat,lon);
 						//if((parseFloat(markers[i].getPosition().lat()) == parseFloat(lat)) && (parseFloat(markers[i].getPosition().lng()) == parseFloat(lon))) {
 						//	markers[i].icon.rotation = parseFloat(heading);
