@@ -39,4 +39,4 @@ class FlightPanel(wx.Panel):
 		#print("update the text")
 
 		currentTime = datetime.now()
-		self.FlightInfoText.SetLabel("\n  Flight Info\n\n  - Flight Name:  %s  \n  - Latitude:  %s Deg - Longitude:  %s Deg \n  - Speed:  %s Knots \n  - Heading:  %s Deg \n  - Altitude:  %s Ft? \n  - Current Fuel:  %s Gals? \n  - Total Fuel Capacity:  %s Gals?\n  - Flight Time:  %s\n  - Current Time:  %s"%(name,lat,lon,speed,heading,alt,currentFuel,fuelCapacity,elapsedTime,currentTime))
+		self.FlightInfoText.SetLabel("\n  Flight Info\n\n  - Flight Name:  %s  \n  - Latitude:  %s Deg - Longitude:  %s Deg \n  - Speed:  %s Knots \n  - Heading:  %s Deg \n  - Altitude:  %s Ft \n  - Current Fuel:  %s Gals \n  - Total Fuel Capacity:  %s Gals\n  - Flight Time:  %s\n  - Current Time:  %s"%(name,lat,lon,speed,heading,alt,currentFuel,fuelCapacity,elapsedTime,currentTime))
