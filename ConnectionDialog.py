@@ -7,7 +7,8 @@ class ConnectionDialog(wx.Dialog):
             style=wx.DEFAULT_DIALOG_STYLE,
             ):
 
-
+		#creating the dialog window
+			
         pre = wx.PreDialog()
         pre.SetExtraStyle(wx.DIALOG_EX_CONTEXTHELP)
         pre.Create(parent, ID, title, pos, size, style)
@@ -42,7 +43,7 @@ class ConnectionDialog(wx.Dialog):
         btnsizer = wx.StdDialogButtonSizer()
         
 
-        
+        #The Buttons: OK and Cancel
         btn = wx.Button(self, wx.ID_OK)
         btn.SetDefault()
         btnsizer.AddButton(btn)

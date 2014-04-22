@@ -16,6 +16,7 @@ class MyListener(object):
   def on_error(self, headers, message):
     print('received an error %s' % message)
 
+  #called everytime a message is received from the ActiveMQ broker. Message sent to main frame to be handled.
   def on_message(self, headers, message):
     self.frame.updateFGObjs(message)
     if message == "SHUTDOWN":

@@ -1,9 +1,10 @@
 from datetime import datetime
 import math
 
-#This class displays a log for a certain flight. Information displayed includes items such as past flights, position information, and time stamps
+#This class represents the object into which all log data is stored
 
 class FGLog():
+	#initialize
     def __init__(self, id, props):
         self.id = id
         startTime = datetime.now()
@@ -18,7 +19,9 @@ class FGLog():
         self.prop_list['lat'].append(props['latitude-deg'])
         self.prop_list['lon'].append(props['longitude-deg'])
         self.prop_list['times'].append(startTime)
+	#update log data
     def updateLog(self,props):
+		#check if most recent flight has ended
 		if('endtime' in self.prop_list):
 			old_prop_list = self.prop_list
 			startTime = datetime.now()

@@ -4,11 +4,11 @@ import string
 #This class is in charge of 'parsing' the message strings received from the ActiveMQ broker sent from FlightGear.
 
 def parse(string):
-    
+    #split the message
     RecordsList = re.split("\n+",string)
     PropDictList = []
     
-    
+    #parse the different properties
     for prop in RecordsList:
         props = re.split(",",prop)
         

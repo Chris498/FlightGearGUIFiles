@@ -5,6 +5,7 @@ import wx.lib.scrolledpanel as scrolled
 
 class Log(wx.Frame):
 	def __init__(self, parent, player, logObject, id):
+		#setup the frame
 		wx.Frame.__init__(self,parent,id,'',size = (500,400), style = wx.DEFAULT_FRAME_STYLE)
 		self.SetTitle("Log")
 		self.Bind(wx.EVT_CLOSE,self.closewindow)
@@ -35,6 +36,7 @@ class Log(wx.Frame):
 		
 		numFlights = len(logObject.prop_list['pastFlights'])
 		
+		#begin with most recent flight
 		textToDisplay = ("\n  FLIGHT LOG \n\n ---------------------------------------------------------------------- \n MOST RECENT FLIGHT (Flight# %s) \n\n Flight Name:  %s \n Flight Started at:  %s \n"%((numFlights+1),logObject.prop_list['name'],logObject.prop_list['startTime']))
 		
 		numPositions = len(logObject.prop_list['lat'])
@@ -46,6 +48,7 @@ class Log(wx.Frame):
 			textToDisplay += " ---------------------------------------------------------------------- \n"
 			
 		
+		#parse previous flights
 		for x in range(0,numFlights):
 			textToDisplay += (" Flight #%s: \n\n Flight started at: %s \n"%((x+1),logObject.prop_list['pastFlights'][x]['startTime']))
 			numPastPositions = len(logObject.prop_list['pastFlights'][x]['lat'])

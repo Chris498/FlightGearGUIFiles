@@ -5,6 +5,7 @@ import wx.lib.scrolledpanel as scrolled
 
 class PlaneSelectPanel(wx.Panel):
 	def __init__(self,parent,id):
+		#setup the panel
 		wx.Panel.__init__(self,parent,id)
 		self.SetBackgroundColour("Black")
 		self.SetDoubleBuffered(True)
@@ -45,7 +46,7 @@ class PlaneSelectPanel(wx.Panel):
 
 
 
-		
+	#adds a new radio button representing a flight
 	def addRadio(self,name):
 		found = 0
 		for theName in self.group1_ctrls:
@@ -63,12 +64,12 @@ class PlaneSelectPanel(wx.Panel):
 			else:
 				radioButton.SetValue(0)
 		self.Layout()
-	
+	#handles a radio button being selected. Update the currently selected flight
 	def OnGroup1Select( self, event ):
 		global currentDisplayFlight
 		radio_selected = event.GetEventObject()
 		self.parent.GetParent().currentDisplayFlight = radio_selected.GetLabel()
-		
+	#removes a radio button
 	def deleteRadio(self,name):
 		if name in self.group1_ctrls: self.group1_ctrls.remove(name)
 		buttons = self.vbox.GetChildren()
@@ -81,6 +82,7 @@ class PlaneSelectPanel(wx.Panel):
 				
 		remainingButtons = self.vbox.GetChildren()
 		
+		#select a different flight if the currently selected flight radio button is removed.
 		if(self.parent.GetParent().currentDisplayFlight == name):
 			for button in remainingButtons:
 				widget  = button.GetWindow()

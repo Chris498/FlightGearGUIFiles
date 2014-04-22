@@ -32,7 +32,7 @@ CONNECTION = wx.NewId()
 class FlightTracker(wx.Frame):
 	def __init__(self, parent, id,):  
 		
-		
+		#Setup the frame
 		super(FlightTracker, self).__init__(parent, size=(1024,700), style = wx.DEFAULT_FRAME_STYLE)
 		self.currentDisplayFlight = "Player"
 		
@@ -41,7 +41,7 @@ class FlightTracker(wx.Frame):
 		self.optionsMenu = wx.Menu()
 		self.connectionMenu = wx.Menu()
 		
-		
+		#menubar setup
 		self.fileMenu.Append(EXIT, 'Exit', 'Exit')
 		self.connectionMenu.Append(CONNECTION,'Edit Connection','Edit Connection')
 		
@@ -54,10 +54,7 @@ class FlightTracker(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.ExitProgram, id=EXIT)
 		self.Bind(wx.EVT_MENU, self.EditConnection, id=CONNECTION)
 		
-		#The top most sizer that splits the screen horizontally
 		TopHorizSizer = wx.BoxSizer(wx.HORIZONTAL)
-		
-		#The rest of the sizers
 		self.RightVertSizer = wx.BoxSizer(wx.VERTICAL)
 		LeftVertSizer = wx.BoxSizer(wx.VERTICAL)
 		GPSSizer = wx.BoxSizer()
@@ -76,16 +73,15 @@ class FlightTracker(wx.Frame):
 		self.RightVertSizer.Add(self.GPS,2,wx.EXPAND|wx.ALL,5)
 		self.RightVertSizer.Add(self.FlightInfo,1,wx.EXPAND|wx.BOTTOM|wx.RIGHT|wx.LEFT,5)#|wx.ALL,5)
 		
+		#add sub panels to the left sizer
 		LeftVertSizer.Add(self.EnvironmentInfo,2,wx.EXPAND|wx.LEFT|wx.TOP|wx.BOTTOM,5)#|wx.ALL,5)
 		LeftVertSizer.Add(self.PlaneSelectPanel,1,wx.EXPAND|wx.BOTTOM|wx.LEFT,5)#|wx.ALL,5)
 		
 
-		
-		#add the left sub panel and right sizer to the main horizontal sizer
+		#combine and set sizers
 		TopHorizSizer.Add(LeftVertSizer,1,wx.EXPAND)
 		TopHorizSizer.Add(self.RightVertSizer,3,wx.EXPAND)
 		
-		#set the main panel's sizer
 		self.MainPanel.SetSizer(TopHorizSizer)
 		self.MainPanel.Fit()
 		
@@ -100,6 +96,7 @@ class FlightTracker(wx.Frame):
 		
 		self.timer.Start(300)
 		
+		#initialize empty data containers
 		self.fgObjects = {}
 		self.fgEnvironmentObject = {}
 		self.fgLogObjects = {}
@@ -108,14 +105,15 @@ class FlightTracker(wx.Frame):
 	def OnTimer(self, event):
 		self.updateLogs()
 		self.updateTheView()
-		
+	
+	#update the log object
 	def updateLogs(self):
 		for name,playerDict in self.fgObjects.items():
 			if(name in self.fgLogObjects):
-				#update
+				#update flight
 				self.fgLogObjects[name].updateLog(self.fgObjects[name].prop_list)
 			else:
-				#add
+				#add flight to log
 				newLog = FGLog(name, self.fgObjects[name].prop_list)
 				self.fgLogObjects[name] = newLog
 				
@@ -133,17 +131,16 @@ class FlightTracker(wx.Frame):
 	def updateTheView(self):
 		for name,playerDict in self.fgObjects.items():
 			if(self.fgObjects[name].prop_list['updated'] == False):
-				#Remove marker from map
+				#Remove flight marker from map
 				scriptString = """removeMarker("%s")""" %(str(name))
 				self.MainPanel.html_view.RunScript(scriptString)
 				
 				#Remove player from fgObjects
 				del self.fgObjects[name]
 				
+				#flight removed from 'Select a Flight' panel
 				self.PlaneSelectPanel.deleteRadio(name)
-				
-				#remove radio
-				#remove from self.fgObjects
+			#update flight information	
 			else:
 				lat = ""
 				lon = ""
@@ -176,10 +173,13 @@ class FlightTracker(wx.Frame):
 				self.fgObjects[name].prop_list['pastLat'] = lat;
 				self.fgObjects[name].prop_list['pastLon'] = lon;
 				selected = self.fgObjects[name].prop_list['selected']
+				
+				#update the GPS map
 				scriptString = """updateMarker(%s,%s,"%s",%s,"%s")""" % (str(lat),str(lon),str(name),str(heading),selected)
 				self.MainPanel.html_view.RunScript(scriptString)
 				self.PlaneSelectPanel.addRadio(name)
 
+				#handle currently selected flight
 				if(name == self.currentDisplayFlight):
 					self.fgObjects[name].prop_list['selected'] = "yes"
 					self.FlightInfo.updateText(name,lat,lon,speed,heading,alt,currentFuel,fuelCapacity,self.fgObjects[name].prop_list['timeElapsed'])
@@ -187,7 +187,7 @@ class FlightTracker(wx.Frame):
 					self.fgObjects[name].prop_list['selected'] = "no"
 			
 			
-		
+		#update environment data
 		stationID = ""
 		skyConditions = ""
 		temperature = ""
@@ -207,7 +207,8 @@ class FlightTracker(wx.Frame):
 				pressure = value
 		self.EnvironmentInfo.UpdateText(stationID,temperature,windSpeed,windDirection,pressure)
 
-		
+	
+	#receive ActiveMQ broker message string and parse it. Update data containers as needed.
 	def updateFGObjs(self, string):
 		if string is not None:
 			fgDictsList = FGParser.parse(string)
@@ -230,20 +231,23 @@ class FlightTracker(wx.Frame):
 					
 
 	
-	
+	#handle log menu event
 	def Log(self,e):
 		item = self.GetMenuBar().FindItemById(e.GetId())
 		name = item.GetText()
 		log = Log(parent = frame,player = name,logObject =self.fgLogObjects[name], id = -1)
 		log.Show()
+	#exit the program
 	def ExitProgram(self,e):
 		self.Destroy()
+	#handle the connection speed menu event
 	def EditConnection(self,e):
 		dlg = ConnectionDialog(self,-1, "Edit Connection", size=(300,300),style = wx.DEFAULT_DIALOG_STYLE,)
 		dlg.CenterOnScreen()
 		
 		val = dlg.ShowModal()
 		
+		#send message to broker to be received by FlightGear detailing new connection speed.
 		if val == wx.ID_OK:
 			try:
 				float(dlg.text.GetValue())
@@ -268,11 +272,12 @@ class FlightTracker(wx.Frame):
 		
 if __name__ == '__main__':
 
+	#initialize the Javascript string for the GPS map panel
 	g = PyMap()                         
 	open('test.htm','wb').write(g.showhtml())   # generate test file
 	
 
-	
+	#initialize frame
 	app=wx.PySimpleApp()
 	frame = FlightTracker(parent = None, id=-1)
 	frame.SetTitle("Flight Tracker")

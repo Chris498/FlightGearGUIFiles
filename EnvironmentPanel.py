@@ -5,6 +5,7 @@ import wx.lib.scrolledpanel as scrolled
 
 class EnvironmentPanel(wx.Panel):
 	def __init__(self,parent,id):
+		#Setup the panel
 		wx.Panel.__init__(self,parent,id)
 		self.SetBackgroundColour("black")
 		self.SetDoubleBuffered(True)
@@ -29,12 +30,14 @@ class EnvironmentPanel(wx.Panel):
 		self.FlightInfoPanel.Layout()
 		
 		self.Centre()
+		#The default text displayed before messages are received
 		self.EnvironmentInfoText = wx.StaticText(self.FlightInfoPanel, label = "\n\n  Environment Info\n\n  - Station ID:\n      \n  - Temperature:\n      \n  - Wind Speed:\n      \n  - Wind Direction:\n      \n  - Air Pressure:\n      \n")
 		self.EnvironmentInfoText.SetFont(self.boldFont)
 		
 		sizer3.Add(self.EnvironmentInfoText)
 		
 		self.FlightInfoPanel.SetAutoLayout(1)
-		
+	
+	#This method updates the Environment text in the panel.
 	def UpdateText(self,stationID,temperature,windSpeed,windDirection,pressure):
 		self.EnvironmentInfoText.SetLabel("\n\n  Environment Info\n\n  - Station ID:\n  %s   \n  - Temperature:\n   %s Deg F  \n  - Wind Speed:\n   %s Knots  \n  - Wind Direction:\n   %s Deg  \n  - Air Pressure:\n   %s inhg   \n"%(stationID,temperature,windSpeed,windDirection, pressure))

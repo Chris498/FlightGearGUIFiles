@@ -21,6 +21,8 @@ class PyMap:
 		var FlightZone;
 		var chicago = new google.maps.LatLng(41.850033, -87.6500523);
 		
+		
+		// Handles the button for 'center on selected'
 		function HomeControl(controlDiv, map) {
 		
 		controlDiv.style.padding = '6px';
@@ -44,8 +46,7 @@ class PyMap:
 		controlText.innerHTML = '<b>Center On Selected</b>';
 		controlUI.appendChild(controlText);
 
-		// Setup the click event listeners: simply set the map to
-		// Chicago
+
 		google.maps.event.addDomListener(controlUI, 'click', function() {
 			for (var i = 0; i < markers.length; i++) {
 				if(markers[i].selected == true)
@@ -57,6 +58,7 @@ class PyMap:
 
 		}
 		
+		//Button that displays the 100 Nautical Mile Flight Zone radius.
 		function RadiusControl(controlDiv, map)  {
 		
 		controlDiv.style.padding = '6px';
@@ -96,7 +98,7 @@ class PyMap:
 		});
 		}
 		
-		
+		//initialize the map
 		function initialize() {
 			center = new google.maps.LatLng(37.6069,-122.381);
 			var mapOptions = {zoom: 8,center: center};
@@ -106,6 +108,8 @@ class PyMap:
 				origin: new google.maps.Point(0,0),
 				anchor: new google.maps.Point(10, 10)
 			};
+			
+			//setup symbols
 			planeSymbol = {
 				path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
 				scale: 4,
@@ -121,7 +125,7 @@ class PyMap:
 			}
 			map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
 			
-
+			//add 'center on selected' and 'show radius' buttons
 			var homeControlDiv = document.createElement('div');
 			var homeControl = new HomeControl(homeControlDiv, map);
 
@@ -135,7 +139,7 @@ class PyMap:
 			radiusControlDiv.index =1;
 			map.controls[google.maps.ControlPosition.TOP_RIGHT].push(radiusControlDiv);
 			
-			
+			//Flight Zone Radius information
 			CircleOptions = {
 			 strokeColor: '#FF0000',
 			 strokeOpacity: 0.8,
@@ -178,6 +182,7 @@ class PyMap:
 			markers = [];
 		}
 
+		//Move flight marker
 		function moveMarker(position, map, marker) {
 			var path = poly.getPath();
 			path.push(position);
@@ -185,7 +190,7 @@ class PyMap:
 			map.panTo(position);
 		}
 		
-
+		//add flight marker
 		function addMarker(lat, lon,name) {
 			var location = new google.maps.LatLng(lat,lon);
 			symbol = {
@@ -209,6 +214,7 @@ class PyMap:
 			markers.push(marker);
 		}
 		
+		//remove a flight marker
 		function removeMarker(name) {
 				for (var i = 0; i < markers.length; i++) {
 					if(markers[i].title == name) {
@@ -218,23 +224,26 @@ class PyMap:
 			}
 		}
 		
-		
+		//update the flight marker
 		function updateMarker(lat, lon,name,heading,selected) {
 			var theIndex;
 			var found = 0
+			//add new flight marker
 			if(markers.length == 0) {
 				addMarker(lat,lon,name);
 			}
 			else {
+				//update existing flight marker
 				for(var i= 0;i<markers.length;i++)
 				{
 					if(markers[i].title == name)
 					{
+						//center Flight Zone radius over the user's flight.
 						if(name == "Player") {
 							FlightZone.setCenter(markers[i].position);
 						}
 						var newPosition = new google.maps.LatLng(lat,lon);
-
+							//change the flight marker colors based on currently selected flight
 							if(selected == 'yes') {
 								symbol = {
 									path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
