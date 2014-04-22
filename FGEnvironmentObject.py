@@ -1,5 +1,7 @@
 from datetime import datetime
 
+#This class defines the Environment Object in FlightTracker that all environment information is stored into.
+
 class FGEnvironmentObject():
     def __init__(self, id, props):
         self.id = id

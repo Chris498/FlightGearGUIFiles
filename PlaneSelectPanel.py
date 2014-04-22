@@ -1,6 +1,8 @@
 import wx
 import wx.lib.scrolledpanel as scrolled
 
+#This class is in charge of the panel: 'Select a Flight' in FlightTracker. The user may decide what flight is the currently selected flight from here.
+
 class PlaneSelectPanel(wx.Panel):
 	def __init__(self,parent,id):
 		wx.Panel.__init__(self,parent,id)
@@ -65,7 +67,6 @@ class PlaneSelectPanel(wx.Panel):
 	def OnGroup1Select( self, event ):
 		global currentDisplayFlight
 		radio_selected = event.GetEventObject()
-		print('Group1 %s selected\n' % radio_selected.GetLabel() )
 		self.parent.GetParent().currentDisplayFlight = radio_selected.GetLabel()
 		
 	def deleteRadio(self,name):
@@ -74,7 +75,6 @@ class PlaneSelectPanel(wx.Panel):
 		
 		for button in buttons:
 			widget  = button.GetWindow()
-			#print(widget.GetLabel())
 			if (widget.GetLabel() == name):
 				self.vbox.Remove(widget)
 				widget.Destroy()

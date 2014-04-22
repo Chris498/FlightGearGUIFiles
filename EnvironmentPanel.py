@@ -1,6 +1,8 @@
 import wx
 import wx.lib.scrolledpanel as scrolled
 
+#This Class handles the Environment Panel that is part of FlightTracker
+
 class EnvironmentPanel(wx.Panel):
 	def __init__(self,parent,id):
 		wx.Panel.__init__(self,parent,id)
@@ -35,5 +37,4 @@ class EnvironmentPanel(wx.Panel):
 		self.FlightInfoPanel.SetAutoLayout(1)
 		
 	def UpdateText(self,stationID,temperature,windSpeed,windDirection,pressure):
-		#print(stationID)
 		self.EnvironmentInfoText.SetLabel("\n\n  Environment Info\n\n  - Station ID:\n  %s   \n  - Temperature:\n   %s Deg F  \n  - Wind Speed:\n   %s Knots  \n  - Wind Direction:\n   %s Deg  \n  - Air Pressure:\n   %s inhg   \n"%(stationID,temperature,windSpeed,windDirection, pressure))

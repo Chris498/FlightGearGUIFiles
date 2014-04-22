@@ -1,6 +1,8 @@
 import wx
 import os
 
+#This class is in charge of the GPS map panel in FlightTracker. It is essentially a panel that houses an html page.
+
 class GPSPanel(wx.Panel):
 	def __init__(self,parent,id):
 		wx.Panel.__init__(self,parent,id)

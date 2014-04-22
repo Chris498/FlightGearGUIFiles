@@ -3,6 +3,8 @@ import stomp
 from datetime import datetime
 import time
 
+#This class acts as the consumer system for FlightTracker. It handles the communication with the ActiveMQ broker.
+
 class MyListener(object):
   
   def __init__(self, conn, frame):

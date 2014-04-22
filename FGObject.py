@@ -1,5 +1,7 @@
 from datetime import datetime
 
+#This Class is in charge of the FGObject which stores all information about flights and their information
+
 class FGObject():
     def __init__(self, id, props):
         self.id = id

@@ -1,6 +1,8 @@
 import wx
 import wx.lib.scrolledpanel as scrolled
 
+#This class displays a log for a certain flight. Information displayed includes items such as past flights, position information, and time stamps
+
 class Log(wx.Frame):
 	def __init__(self, parent, player, logObject, id):
 		wx.Frame.__init__(self,parent,id,'',size = (500,400), style = wx.DEFAULT_FRAME_STYLE)
@@ -38,9 +40,6 @@ class Log(wx.Frame):
 		numPositions = len(logObject.prop_list['lat'])
 		for x in range(0,numPositions):
 			textToDisplay += ("     ENTRY %s: Time: %s, Latitude: %s, Longitude: %s \n"% (x+1,logObject.prop_list['times'][x],logObject.prop_list['lat'][x],logObject.prop_list['lon'][x]))
-			#print(logObject.prop_list['lat'][x])
-			#print(logObject.prop_list['lon'][x])
-		#print numPositions
 		if 'endtime' in logObject.prop_list:
 			textToDisplay += (" Flight ended at: %s \n\n ---------------------------------------------------------------------- \n" % logObject.prop_list['endtime'])
 		else:
@@ -48,7 +47,6 @@ class Log(wx.Frame):
 			
 		
 		for x in range(0,numFlights):
-			#oldFlight_prop_list = logObject.prop_list['pastFlights'][x]
 			textToDisplay += (" Flight #%s: \n\n Flight started at: %s \n"%((x+1),logObject.prop_list['pastFlights'][x]['startTime']))
 			numPastPositions = len(logObject.prop_list['pastFlights'][x]['lat'])
 			for y in range(0, numPastPositions):
@@ -63,10 +61,6 @@ class Log(wx.Frame):
 		sizer3.Add(self.FlightInfoText)
 		
 		self.LogPanel.SetAutoLayout(1)
-		
-		
-		#panel=wx.Panel(self)
-		#panel.SetBackgroundColour('White')
 
 		
 	def closewindow(self,event):

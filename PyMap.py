@@ -1,5 +1,7 @@
 import wx
 
+#This class houses the javascript that will be embedded in the html code that is used in the GPS map panel in FlightTracker.
+
 class PyMap:
     def GoogleMapPy(self):
 		""" Returns complete javacript for rendering map """
@@ -7,7 +9,6 @@ class PyMap:
 		self.js = """<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 		<script>
 		var map;
-		//var marker;
 		var center;
 		var poly;
 		var infowindow;
@@ -21,10 +22,6 @@ class PyMap:
 		var chicago = new google.maps.LatLng(41.850033, -87.6500523);
 		
 		function HomeControl(controlDiv, map) {
-
-		// Set CSS styles for the DIV containing the control
-		// Setting padding to 5 px will offset the control
-		// from the edge of the map
 		
 		controlDiv.style.padding = '6px';
 
@@ -61,9 +58,6 @@ class PyMap:
 		}
 		
 		function RadiusControl(controlDiv, map)  {
-				// Set CSS styles for the DIV containing the control
-		// Setting padding to 6 px will offset the control
-		// from the edge of the map
 		
 		controlDiv.style.padding = '6px';
 
@@ -105,14 +99,11 @@ class PyMap:
 		
 		function initialize() {
 			center = new google.maps.LatLng(37.6069,-122.381);
-			var mapOptions = {zoom: 8,center: center};//,mapTypeId: google.maps.MapTypeId.TERRAIN};
+			var mapOptions = {zoom: 8,center: center};
 			image = {
 				url: 'PlaneImage.png',
-				// This marker is 20 pixels wide by 32 pixels tall.
 				size: new google.maps.Size(20, 20),
-				// The origin for this image is 0,0.
 				origin: new google.maps.Point(0,0),
-				// The anchor for this image is the base of the flagpole at 0,32.
 				anchor: new google.maps.Point(10, 10)
 			};
 			planeSymbol = {
@@ -130,9 +121,7 @@ class PyMap:
 			}
 			map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
 			
-			// Create the DIV to hold the control and
-			// call the HomeControl() constructor passing
-			// in this DIV.
+
 			var homeControlDiv = document.createElement('div');
 			var homeControl = new HomeControl(homeControlDiv, map);
 
@@ -245,10 +234,6 @@ class PyMap:
 							FlightZone.setCenter(markers[i].position);
 						}
 						var newPosition = new google.maps.LatLng(lat,lon);
-						//if((parseFloat(markers[i].getPosition().lat()) == parseFloat(lat)) && (parseFloat(markers[i].getPosition().lng()) == parseFloat(lon))) {
-						//	markers[i].icon.rotation = parseFloat(heading);
-						//}
-						//else {
 
 							if(selected == 'yes') {
 								symbol = {
@@ -274,7 +259,6 @@ class PyMap:
 							}
 
 							markers[i].setPosition(newPosition);
-							//markers[i].setIcon(symbol);
 							
 
 							
@@ -292,7 +276,6 @@ class PyMap:
 							markers[i].pastLon = lon;
 							
 							
-						//}
 						found = 1
 					}
 				}

@@ -27,11 +27,13 @@ EXIT = wx.NewId()
 LOG = wx.NewId()
 CONNECTION = wx.NewId()
 
-class FlightSimulatorSuite(wx.Frame):
+#This Class is in charge of the main program: FlightTracker. It creates a window in which all the functionalities of the other classes lie.
+
+class FlightTracker(wx.Frame):
 	def __init__(self, parent, id,):  
 		
 		
-		super(FlightSimulatorSuite, self).__init__(parent, size=(1024,700), style = wx.DEFAULT_FRAME_STYLE)#^wx.RESIZE_BORDER)
+		super(FlightTracker, self).__init__(parent, size=(1024,700), style = wx.DEFAULT_FRAME_STYLE)
 		self.currentDisplayFlight = "Player"
 		
 		self.menubar = wx.MenuBar()
@@ -51,7 +53,6 @@ class FlightSimulatorSuite(wx.Frame):
 		
 		self.Bind(wx.EVT_MENU, self.ExitProgram, id=EXIT)
 		self.Bind(wx.EVT_MENU, self.EditConnection, id=CONNECTION)
-		#self.Bind(wx.EVT_MENU, self.Log, id=LOG)
 		
 		#The top most sizer that splits the screen horizontally
 		TopHorizSizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -112,11 +113,9 @@ class FlightSimulatorSuite(wx.Frame):
 		for name,playerDict in self.fgObjects.items():
 			if(name in self.fgLogObjects):
 				#update
-				#print("update: %s log"% name)
 				self.fgLogObjects[name].updateLog(self.fgObjects[name].prop_list)
 			else:
 				#add
-				#print("add to logs: %s" % name)
 				newLog = FGLog(name, self.fgObjects[name].prop_list)
 				self.fgLogObjects[name] = newLog
 				
@@ -132,17 +131,11 @@ class FlightSimulatorSuite(wx.Frame):
 
 	#updates main panel which will update all sub panels
 	def updateTheView(self):
-		
-		#self.EnvironmentInfo.Update()
-		#self.FlightInfo.Update()
-		
-
 		for name,playerDict in self.fgObjects.items():
 			if(self.fgObjects[name].prop_list['updated'] == False):
 				#Remove marker from map
 				scriptString = """removeMarker("%s")""" %(str(name))
 				self.MainPanel.html_view.RunScript(scriptString)
-				print("remove: %s"%name)
 				
 				#Remove player from fgObjects
 				del self.fgObjects[name]
@@ -176,8 +169,6 @@ class FlightSimulatorSuite(wx.Frame):
 					elif(property == "total-fuel-capacity"):
 						fuelCapacity = value 
 					
-					#print("property: %s, value: %s"%(property,value))
-
 					
 				currentTime = datetime.now()
 				elapsedTime = currentTime - self.fgObjects[name].prop_list['startTime']
@@ -214,8 +205,6 @@ class FlightSimulatorSuite(wx.Frame):
 				windSpeed = value
 			elif(property == "pressure"):
 				pressure = value
-		#print(stationID)
-		print(pressure)
 		self.EnvironmentInfo.UpdateText(stationID,temperature,windSpeed,windDirection,pressure)
 
 		
@@ -245,8 +234,6 @@ class FlightSimulatorSuite(wx.Frame):
 	def Log(self,e):
 		item = self.GetMenuBar().FindItemById(e.GetId())
 		name = item.GetText()
-		#name = e.GetEventObject().GetName()
-		#print("selected menu item: %s"%name)
 		log = Log(parent = frame,player = name,logObject =self.fgLogObjects[name], id = -1)
 		log.Show()
 	def ExitProgram(self,e):
@@ -258,10 +245,8 @@ class FlightSimulatorSuite(wx.Frame):
 		val = dlg.ShowModal()
 		
 		if val == wx.ID_OK:
-			#print(dlg.text.GetValue())
 			try:
 				float(dlg.text.GetValue())
-				print(dlg.text.GetValue())
 				user = os.getenv("ACTIVEMQ_USER") or "admin"
 				password = os.getenv("ACTIVEMQ_PASSWORD") or "password"
 				host = os.getenv("ACTIVEMQ_HOST") or "localhost"
@@ -289,8 +274,8 @@ if __name__ == '__main__':
 
 	
 	app=wx.PySimpleApp()
-	frame = FlightSimulatorSuite(parent = None, id=-1)
-	frame.SetTitle("Flight Simulator Suite")
+	frame = FlightTracker(parent = None, id=-1)
+	frame.SetTitle("Flight Tracker")
 	
 	#------------------------------------------------------------------------
 	###
@@ -301,8 +286,6 @@ if __name__ == '__main__':
 	host = os.getenv("ACTIVEMQ_HOST") or "localhost"
 	port = os.getenv("ACTIVEMQ_PORT") or 61613
 	conn2 = stomp.Connection(host_and_ports = [(host, port)])
-	#conn2 = stomp.Connection(host_and_ports = [("35.9.22.201", port)])
-	#conn = stomp.Connection(host_and_ports = [("10.0.1.17", port)])
 	conn2.set_listener('', MyListener(conn2,frame))
 	conn2.start()
 	conn2.connect(login=user,passcode=password)
